@@ -400,13 +400,31 @@ export function ComponentEditor() {
               onChange={(v) => updateComponentConfig(component.id, { isCharging: v })}
             />
             <Slider
-              label="EV Battery"
-              value={config.evBatteryPercent ?? 40}
+              label="EV Battery (start %)"
+              value={Math.round(config.evBatteryPercent ?? 40)}
               min={0}
               max={100}
               step={1}
               unit="%"
               onChange={(v) => updateComponentConfig(component.id, { evBatteryPercent: v })}
+            />
+            <NumberInput
+              label="EV Capacity"
+              value={config.evCapacityKwh ?? 60}
+              unit="kWh"
+              min={10}
+              max={200}
+              step={5}
+              onChange={(v) => updateComponentConfig(component.id, { evCapacityKwh: v })}
+            />
+            <NumberInput
+              label="Efficiency"
+              value={config.evEfficiencyKmPerKwh ?? 6}
+              unit="km/kWh"
+              min={3}
+              max={12}
+              step={0.5}
+              onChange={(v) => updateComponentConfig(component.id, { evEfficiencyKmPerKwh: v })}
             />
           </>
         );

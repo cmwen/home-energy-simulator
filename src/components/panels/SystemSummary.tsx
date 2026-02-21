@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sun, Home, ArrowDownToLine, ArrowUpFromLine, Battery, Zap } from 'lucide-react';
+import { Sun, Home, ArrowDownToLine, ArrowUpFromLine, Battery, Zap, Car } from 'lucide-react';
 import { useEnergyStore } from '../../store/energyStore';
 
 const barStyle: React.CSSProperties = {
@@ -89,6 +89,15 @@ export function SystemSummary() {
     batteryColor = '#f59e0b';
   }
 
+  const evComponent = components.find((c) => c.type === 'evCharger' && c.enabled);
+  const evSoc = evComponent?.config.evBatteryPercent ?? 0;
+  const evSessionKwh = evComponent?.config.evSessionKwh ?? 0;
+  const evEfficiency = evComponent?.config.evEfficiencyKmPerKwh ?? 6;
+  const evKmAdded = evSessionKwh * evEfficiency;
+  const evPowerW = evComponent ? Math.abs(evComponent.currentPowerW) : 0;
+  const evIsCharging = evPowerW > 0;
+  const evColor = evIsCharging ? '#7aa2f7' : '#6b7280';
+
   return (
     <div style={barStyle}>
       <div style={cardStyle}>
@@ -117,10 +126,26 @@ export function SystemSummary() {
 
       <div style={cardStyle}>
         <Battery size={20} color={batteryColor} />
-        <span style={cardLabelStyle}>Battery {batterySoc}%</span>
+        <span style={cardLabelStyle}>Battery {Math.round(batterySoc)}%</span>
         <span style={{ ...cardValueStyle, fontSize: 13, color: batteryColor }}>{batteryStatusText}</span>
         <ProgressBar percent={batterySoc} color={batteryColor} />
       </div>
+
+      {evComponent && (
+        <div style={cardStyle}>
+          <Car size={20} color={evColor} />
+          <span style={cardLabelStyle}>EV {Math.round(evSoc)}%</span>
+          <span style={{ ...cardValueStyle, fontSize: 13, color: evColor }}>
+            {evIsCharging ? formatKW(evPowerW) : (evSoc >= 100 ? 'Full' : 'Not charging')}
+          </span>
+          <ProgressBar percent={evSoc} color={evColor} />
+          {evSessionKwh > 0 && (
+            <span style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>
+              +{evKmAdded.toFixed(0)} km ({evSessionKwh.toFixed(1)} kWh)
+            </span>
+          )}
+        </div>
+      )}
 
       <div style={cardStyle}>
         <Zap size={20} color="#a78bfa" />

@@ -53,7 +53,10 @@ export interface ComponentConfig {
   chargingStandard?: ChargingStandard;
   chargingMode?: ChargingMode;
   isCharging?: boolean;
-  evBatteryPercent?: number;
+  evBatteryPercent?: number;    // current SoC 0-100
+  evCapacityKwh?: number;       // usable battery capacity (e.g. 60 kWh)
+  evEfficiencyKmPerKwh?: number; // km per kWh (used to show km added, default 6)
+  evSessionKwh?: number;        // energy delivered this session (reset when charging starts)
   
   // Inverter specific
   maxOutputW?: number;

@@ -187,6 +187,13 @@ export function calculatePowerFlows(
       ev.currentPowerW = 0;
       continue;
     }
+
+    const evSoc = ev.config.evBatteryPercent ?? 50;
+    // Stop charging if battery is full
+    if (evSoc >= 100) {
+      ev.currentPowerW = 0;
+      continue;
+    }
     
     const maxCharge = (ev.config.maxCurrentA ?? 32) * (ev.config.voltage ?? 230) * (ev.config.phases ?? 1);
     let evDemandW = 0;
@@ -221,6 +228,17 @@ export function calculatePowerFlows(
         }
         break;
     }
+
+    // Integrate EV SoC when simulation is running
+    if (simulation.isRunning && evDemandW > 0) {
+      const capacityKwh = ev.config.evCapacityKwh ?? 60;
+      const deltaHours = 0.05 * simulation.speedMultiplier;
+      const addedKwh = (evDemandW / 1000) * deltaHours;
+      const addedSoc = (addedKwh / capacityKwh) * 100;
+      const newSoc = Math.min(100, evSoc + addedSoc);
+      const newSessionKwh = (ev.config.evSessionKwh ?? 0) + addedKwh;
+      ev.config = { ...ev.config, evBatteryPercent: newSoc, evSessionKwh: newSessionKwh };
+    }
     
     ev.currentPowerW = -evDemandW;
     
@@ -252,6 +270,15 @@ export function calculatePowerFlows(
       const chargeW = Math.min(surplusW, maxCharge);
       bat.currentPowerW = chargeW;
       surplusW -= chargeW;
+
+      // Integrate SoC when running
+      if (simulation.isRunning) {
+        const capacityKwh = bat.config.capacityKwh ?? 10;
+        const deltaHours = 0.05 * simulation.speedMultiplier;
+        const addedKwh = (chargeW / 1000) * deltaHours;
+        const newSoc = Math.min(100, soc + (addedKwh / capacityKwh) * 100);
+        bat.config = { ...bat.config, currentSocPercent: newSoc };
+      }
       
       const sourceId = hubId ?? (inverters.length > 0 ? inverters[0].id : null);
       if (sourceId) {
@@ -262,11 +289,20 @@ export function calculatePowerFlows(
           label: `${(chargeW / 1000).toFixed(1)} kW`,
         });
       }
-    } else if (unmetDemandW > 0 && soc > 10) {
+    } else if (unmetDemandW > 0 && soc > 0) {
       // Discharge battery back into the switchboard to cover demand
       const dischargeW = Math.min(unmetDemandW, maxDischarge);
       bat.currentPowerW = -dischargeW;
       unmetDemandW -= dischargeW;
+
+      // Integrate SoC when running
+      if (simulation.isRunning) {
+        const capacityKwh = bat.config.capacityKwh ?? 10;
+        const deltaHours = 0.05 * simulation.speedMultiplier;
+        const removedKwh = (dischargeW / 1000) * deltaHours;
+        const newSoc = Math.max(0, soc - (removedKwh / capacityKwh) * 100);
+        bat.config = { ...bat.config, currentSocPercent: newSoc };
+      }
       
       const destId = hubId ?? (homeLoads.length > 0 ? homeLoads[0].id : null);
       if (destId) {

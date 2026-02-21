@@ -97,6 +97,9 @@ function createDefaultComponent(type: ComponentType, id: string): EnergyComponen
         chargingMode: 'eco',
         isCharging: false,
         evBatteryPercent: 40,
+        evCapacityKwh: 60,
+        evEfficiencyKmPerKwh: 6,
+        evSessionKwh: 0,
       },
     },
     homeLoad: {
@@ -216,7 +219,7 @@ export const scenarioPresets: ScenarioPreset[] = [
       { id: 'monitor-1', type: 'energyMonitor', name: 'Energy Monitor (CT)', enabled: true, position: { x: 380, y: 170 }, maxPowerW: 0, currentPowerW: 0, config: { monitoredCircuits: ['solar', 'grid', 'ev', 'total'] } },
       { id: 'solar-1', type: 'solarPanel', name: 'Solar Panels', enabled: true, position: { x: 245, y: 80 }, maxPowerW: 10000, currentPowerW: 0, config: { panelCount: 24, panelWattage: 415, roofAngle: 22, roofOrientation: 0 } },
       { id: 'inverter-1', type: 'inverter', name: 'Hybrid Inverter', enabled: true, position: { x: 130, y: 170 }, maxPowerW: 10000, currentPowerW: 0, config: { maxOutputW: 10000, efficiency: 0.97, hybridMode: false } },
-      { id: 'ev-1', type: 'evCharger', name: 'EV Charger', enabled: true, position: { x: 560, y: 170 }, maxPowerW: 7400, currentPowerW: 0, config: { maxCurrentA: 32, phases: 1, voltage: 230, chargingStandard: 'ocpp201', chargingMode: 'solar_only', isCharging: true, evBatteryPercent: 35 } },
+      { id: 'ev-1', type: 'evCharger', name: 'EV Charger', enabled: true, position: { x: 560, y: 170 }, maxPowerW: 7400, currentPowerW: 0, config: { maxCurrentA: 32, phases: 1, voltage: 230, chargingStandard: 'ocpp201', chargingMode: 'solar_only', isCharging: true, evBatteryPercent: 35, evCapacityKwh: 60, evEfficiencyKmPerKwh: 6, evSessionKwh: 0 } },
       { id: 'load-1', type: 'homeLoad', name: 'Home Consumption', enabled: true, position: { x: 500, y: 290 }, maxPowerW: 15000, currentPowerW: -1500, config: { baseLoadW: 1500 } },
     ],
     simulation: { timeOfDay: 11, cloudCover: 0.1, season: 'summer', isRunning: false, speedMultiplier: 1, temperature: 27 },
@@ -239,7 +242,7 @@ export const scenarioPresets: ScenarioPreset[] = [
       { id: 'solar-1', type: 'solarPanel', name: 'Solar Panels', enabled: true, position: { x: 245, y: 80 }, maxPowerW: 10000, currentPowerW: 0, config: { panelCount: 24, panelWattage: 415, roofAngle: 25, roofOrientation: 0 } },
       { id: 'inverter-1', type: 'inverter', name: 'Hybrid Inverter', enabled: true, position: { x: 130, y: 170 }, maxPowerW: 10000, currentPowerW: 0, config: { maxOutputW: 10000, efficiency: 0.97, hybridMode: true } },
       { id: 'battery-1', type: 'battery', name: 'Home Battery', enabled: true, position: { x: 60, y: 170 }, maxPowerW: 5000, currentPowerW: 0, config: { capacityKwh: 13.5, currentSocPercent: 40, maxChargeRateW: 5000, maxDischargeRateW: 5000 } },
-      { id: 'ev-1', type: 'evCharger', name: 'EV Charger', enabled: true, position: { x: 560, y: 170 }, maxPowerW: 7400, currentPowerW: 0, config: { maxCurrentA: 32, phases: 1, voltage: 230, chargingStandard: 'ocpp201', chargingMode: 'eco', isCharging: true, evBatteryPercent: 50 } },
+      { id: 'ev-1', type: 'evCharger', name: 'EV Charger', enabled: true, position: { x: 560, y: 170 }, maxPowerW: 7400, currentPowerW: 0, config: { maxCurrentA: 32, phases: 1, voltage: 230, chargingStandard: 'ocpp201', chargingMode: 'eco', isCharging: true, evBatteryPercent: 50, evCapacityKwh: 60, evEfficiencyKmPerKwh: 6, evSessionKwh: 0 } },
       { id: 'load-1', type: 'homeLoad', name: 'Home Consumption', enabled: true, position: { x: 500, y: 290 }, maxPowerW: 15000, currentPowerW: -2000, config: { baseLoadW: 2000 } },
     ],
     simulation: { timeOfDay: 13, cloudCover: 0.2, season: 'summer', isRunning: false, speedMultiplier: 1, temperature: 25 },
@@ -339,9 +342,15 @@ export const useEnergyStore = create<EnergyStore>((set, get) => ({
 
   updateComponentConfig: (id, config) => {
     set((state) => ({
-      components: state.components.map((c) =>
-        c.id === id ? { ...c, config: { ...c.config, ...config } } : c
-      ),
+      components: state.components.map((c) => {
+        if (c.id !== id) return c;
+        // When EV charging is started (isCharging toggled on), reset the session energy counter
+        const resetSession =
+          c.type === 'evCharger' && config.isCharging === true && c.config.isCharging === false
+            ? { evSessionKwh: 0 }
+            : {};
+        return { ...c, config: { ...c.config, ...config, ...resetSession } };
+      }),
     }));
     get().recalculate();
   },
