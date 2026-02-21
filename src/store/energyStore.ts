@@ -18,7 +18,7 @@ function createDefaultComponent(type: ComponentType, id: string): EnergyComponen
       name: 'Power Grid',
       maxPowerW: 25000,
       currentPowerW: 0,
-      position: { x: 60, y: 290 },
+      position: { x: 80, y: 380 },
       config: {},
     },
     gridMeter: {
@@ -28,7 +28,7 @@ function createDefaultComponent(type: ComponentType, id: string): EnergyComponen
       name: 'Grid Meter (NMI)',
       maxPowerW: 25000,
       currentPowerW: 0,
-      position: { x: 195, y: 290 },
+      position: { x: 240, y: 380 },
       config: { gridExportLimitW: 5000, feedInTariff: 0.05, importTariff: 0.32 },
     },
     // Legacy alias — same behaviour as gridMeter
@@ -36,7 +36,7 @@ function createDefaultComponent(type: ComponentType, id: string): EnergyComponen
       name: 'Grid Meter (NMI)',
       maxPowerW: 25000,
       currentPowerW: 0,
-      position: { x: 195, y: 290 },
+      position: { x: 240, y: 380 },
       config: { gridExportLimitW: 5000, feedInTariff: 0.05, importTariff: 0.32 },
     },
     mainSwitchboard: {
@@ -46,7 +46,7 @@ function createDefaultComponent(type: ComponentType, id: string): EnergyComponen
       name: 'Main Switchboard',
       maxPowerW: 25000,
       currentPowerW: 0,
-      position: { x: 380, y: 290 },
+      position: { x: 430, y: 380 },
       config: {},
     },
     energyMonitor: {
@@ -57,28 +57,28 @@ function createDefaultComponent(type: ComponentType, id: string): EnergyComponen
       name: 'Energy Monitor (CT)',
       maxPowerW: 0,
       currentPowerW: 0,
-      position: { x: 380, y: 170 },
+      position: { x: 430, y: 240 },
       config: { monitoredCircuits: ['solar', 'grid', 'ev', 'total'] },
     },
     solarPanel: {
       name: 'Solar Panels',
       maxPowerW: 10000,
       currentPowerW: 0,
-      position: { x: 380, y: 80 },
+      position: { x: 430, y: 100 },
       config: { panelCount: 20, panelWattage: 400, roofAngle: 30, roofOrientation: 0 },
     },
     inverter: {
       name: 'Hybrid Inverter',
       maxPowerW: 8000,
       currentPowerW: 0,
-      position: { x: 245, y: 170 },
+      position: { x: 240, y: 240 },
       config: { maxOutputW: 8000, efficiency: 0.97, hybridMode: true },
     },
     battery: {
       name: 'Home Battery',
       maxPowerW: 5000,
       currentPowerW: 0,
-      position: { x: 130, y: 170 },
+      position: { x: 80, y: 240 },
       config: { capacityKwh: 10, currentSocPercent: 50, maxChargeRateW: 5000, maxDischargeRateW: 5000 },
     },
     evCharger: {
@@ -88,7 +88,7 @@ function createDefaultComponent(type: ComponentType, id: string): EnergyComponen
       name: 'EV Charger',
       maxPowerW: 7400,
       currentPowerW: 0,
-      position: { x: 560, y: 170 },
+      position: { x: 800, y: 380 },
       config: {
         maxCurrentA: 32,
         phases: 1,
@@ -106,14 +106,14 @@ function createDefaultComponent(type: ComponentType, id: string): EnergyComponen
       name: 'Home Consumption',
       maxPowerW: 15000,
       currentPowerW: -1500,
-      position: { x: 500, y: 290 },
+      position: { x: 620, y: 380 },
       config: { baseLoadW: 1500 },
     },
     heatPump: {
       name: 'Heat Pump',
       maxPowerW: 3500,
       currentPowerW: 0,
-      position: { x: 560, y: 400 },
+      position: { x: 980, y: 380 },
       config: { copRating: 3.5 },
     },
   };
@@ -172,12 +172,12 @@ export const scenarioPresets: ScenarioPreset[] = [
     context:
       'Ausgrid zone. 5 kW export limit applies. Feed-in tariff is low (~5¢/kWh) so self-use is far more valuable than exporting.',
     components: [
-      { id: 'grid-1', type: 'grid', name: 'Power Grid', enabled: true, position: { x: 60, y: 290 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
-      { id: 'meter-1', type: 'gridMeter', name: 'Grid Meter (NMI)', enabled: true, position: { x: 195, y: 290 }, maxPowerW: 25000, currentPowerW: 0, config: { gridExportLimitW: 5000, feedInTariff: 0.05, importTariff: 0.32 } },
-      { id: 'board-1', type: 'mainSwitchboard', name: 'Main Switchboard', enabled: true, position: { x: 380, y: 290 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
-      { id: 'solar-1', type: 'solarPanel', name: 'Solar Panels', enabled: true, position: { x: 380, y: 80 }, maxPowerW: 6600, currentPowerW: 0, config: { panelCount: 16, panelWattage: 415, roofAngle: 22, roofOrientation: 0 } },
-      { id: 'inverter-1', type: 'inverter', name: 'String Inverter', enabled: true, position: { x: 245, y: 170 }, maxPowerW: 5000, currentPowerW: 0, config: { maxOutputW: 5000, efficiency: 0.975, hybridMode: false } },
-      { id: 'load-1', type: 'homeLoad', name: 'Home Consumption', enabled: true, position: { x: 500, y: 290 }, maxPowerW: 15000, currentPowerW: -1800, config: { baseLoadW: 1800 } },
+      { id: 'grid-1', type: 'grid', name: 'Power Grid', enabled: true, position: { x: 80, y: 380 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
+      { id: 'meter-1', type: 'gridMeter', name: 'Grid Meter (NMI)', enabled: true, position: { x: 240, y: 380 }, maxPowerW: 25000, currentPowerW: 0, config: { gridExportLimitW: 5000, feedInTariff: 0.05, importTariff: 0.32 } },
+      { id: 'board-1', type: 'mainSwitchboard', name: 'Main Switchboard', enabled: true, position: { x: 430, y: 380 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
+      { id: 'solar-1', type: 'solarPanel', name: 'Solar Panels', enabled: true, position: { x: 430, y: 100 }, maxPowerW: 6600, currentPowerW: 0, config: { panelCount: 16, panelWattage: 415, roofAngle: 22, roofOrientation: 0 } },
+      { id: 'inverter-1', type: 'inverter', name: 'String Inverter', enabled: true, position: { x: 240, y: 240 }, maxPowerW: 5000, currentPowerW: 0, config: { maxOutputW: 5000, efficiency: 0.975, hybridMode: false } },
+      { id: 'load-1', type: 'homeLoad', name: 'Home Consumption', enabled: true, position: { x: 620, y: 380 }, maxPowerW: 15000, currentPowerW: -1800, config: { baseLoadW: 1800 } },
     ],
     simulation: { timeOfDay: 13, cloudCover: 0.1, season: 'summer', isRunning: false, speedMultiplier: 1, temperature: 28 },
   },
@@ -192,13 +192,13 @@ export const scenarioPresets: ScenarioPreset[] = [
     context:
       'Without a battery, 60–70% of solar might be exported at low feed-in rates. With a 10 kWh battery, most homes can reach near-zero grid imports on sunny days.',
     components: [
-      { id: 'grid-1', type: 'grid', name: 'Power Grid', enabled: true, position: { x: 60, y: 290 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
-      { id: 'meter-1', type: 'gridMeter', name: 'Grid Meter (NMI)', enabled: true, position: { x: 195, y: 290 }, maxPowerW: 25000, currentPowerW: 0, config: { gridExportLimitW: 5000, feedInTariff: 0.05, importTariff: 0.32 } },
-      { id: 'board-1', type: 'mainSwitchboard', name: 'Main Switchboard', enabled: true, position: { x: 380, y: 290 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
-      { id: 'solar-1', type: 'solarPanel', name: 'Solar Panels', enabled: true, position: { x: 380, y: 80 }, maxPowerW: 8000, currentPowerW: 0, config: { panelCount: 20, panelWattage: 400, roofAngle: 25, roofOrientation: 0 } },
-      { id: 'inverter-1', type: 'inverter', name: 'Hybrid Inverter', enabled: true, position: { x: 245, y: 170 }, maxPowerW: 8000, currentPowerW: 0, config: { maxOutputW: 8000, efficiency: 0.97, hybridMode: true } },
-      { id: 'battery-1', type: 'battery', name: 'Home Battery', enabled: true, position: { x: 130, y: 170 }, maxPowerW: 5000, currentPowerW: 0, config: { capacityKwh: 10, currentSocPercent: 30, maxChargeRateW: 5000, maxDischargeRateW: 5000 } },
-      { id: 'load-1', type: 'homeLoad', name: 'Home Consumption', enabled: true, position: { x: 500, y: 290 }, maxPowerW: 15000, currentPowerW: -1800, config: { baseLoadW: 1800 } },
+      { id: 'grid-1', type: 'grid', name: 'Power Grid', enabled: true, position: { x: 80, y: 380 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
+      { id: 'meter-1', type: 'gridMeter', name: 'Grid Meter (NMI)', enabled: true, position: { x: 240, y: 380 }, maxPowerW: 25000, currentPowerW: 0, config: { gridExportLimitW: 5000, feedInTariff: 0.05, importTariff: 0.32 } },
+      { id: 'board-1', type: 'mainSwitchboard', name: 'Main Switchboard', enabled: true, position: { x: 430, y: 380 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
+      { id: 'solar-1', type: 'solarPanel', name: 'Solar Panels', enabled: true, position: { x: 430, y: 100 }, maxPowerW: 8000, currentPowerW: 0, config: { panelCount: 20, panelWattage: 400, roofAngle: 25, roofOrientation: 0 } },
+      { id: 'inverter-1', type: 'inverter', name: 'Hybrid Inverter', enabled: true, position: { x: 240, y: 240 }, maxPowerW: 8000, currentPowerW: 0, config: { maxOutputW: 8000, efficiency: 0.97, hybridMode: true } },
+      { id: 'battery-1', type: 'battery', name: 'Home Battery', enabled: true, position: { x: 80, y: 240 }, maxPowerW: 5000, currentPowerW: 0, config: { capacityKwh: 10, currentSocPercent: 30, maxChargeRateW: 5000, maxDischargeRateW: 5000 } },
+      { id: 'load-1', type: 'homeLoad', name: 'Home Consumption', enabled: true, position: { x: 620, y: 380 }, maxPowerW: 15000, currentPowerW: -1800, config: { baseLoadW: 1800 } },
     ],
     simulation: { timeOfDay: 14, cloudCover: 0.15, season: 'summer', isRunning: false, speedMultiplier: 1, temperature: 26 },
   },
@@ -213,14 +213,14 @@ export const scenarioPresets: ScenarioPreset[] = [
     context:
       'The EV charger sits on the main switchboard — it draws from whatever the board is fed with (solar, battery, or grid). A CT clamp monitors the grid connection: when solar surplus pushes the meter to zero import, the charger ramps up. Without a CT clamp or energy monitor, "solar-only" charging is not possible.',
     components: [
-      { id: 'grid-1', type: 'grid', name: 'Power Grid', enabled: true, position: { x: 60, y: 290 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
-      { id: 'meter-1', type: 'gridMeter', name: 'Grid Meter (NMI)', enabled: true, position: { x: 195, y: 290 }, maxPowerW: 25000, currentPowerW: 0, config: { gridExportLimitW: 5000, feedInTariff: 0.05, importTariff: 0.32 } },
-      { id: 'board-1', type: 'mainSwitchboard', name: 'Main Switchboard', enabled: true, position: { x: 380, y: 290 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
-      { id: 'monitor-1', type: 'energyMonitor', name: 'Energy Monitor (CT)', enabled: true, position: { x: 380, y: 170 }, maxPowerW: 0, currentPowerW: 0, config: { monitoredCircuits: ['solar', 'grid', 'ev', 'total'] } },
-      { id: 'solar-1', type: 'solarPanel', name: 'Solar Panels', enabled: true, position: { x: 245, y: 80 }, maxPowerW: 10000, currentPowerW: 0, config: { panelCount: 24, panelWattage: 415, roofAngle: 22, roofOrientation: 0 } },
-      { id: 'inverter-1', type: 'inverter', name: 'Hybrid Inverter', enabled: true, position: { x: 130, y: 170 }, maxPowerW: 10000, currentPowerW: 0, config: { maxOutputW: 10000, efficiency: 0.97, hybridMode: false } },
-      { id: 'ev-1', type: 'evCharger', name: 'EV Charger', enabled: true, position: { x: 560, y: 170 }, maxPowerW: 7400, currentPowerW: 0, config: { maxCurrentA: 32, phases: 1, voltage: 230, chargingStandard: 'ocpp201', chargingMode: 'solar_only', isCharging: true, evBatteryPercent: 35, evCapacityKwh: 60, evEfficiencyKmPerKwh: 6, evSessionKwh: 0 } },
-      { id: 'load-1', type: 'homeLoad', name: 'Home Consumption', enabled: true, position: { x: 500, y: 290 }, maxPowerW: 15000, currentPowerW: -1500, config: { baseLoadW: 1500 } },
+      { id: 'grid-1', type: 'grid', name: 'Power Grid', enabled: true, position: { x: 80, y: 380 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
+      { id: 'meter-1', type: 'gridMeter', name: 'Grid Meter (NMI)', enabled: true, position: { x: 240, y: 380 }, maxPowerW: 25000, currentPowerW: 0, config: { gridExportLimitW: 5000, feedInTariff: 0.05, importTariff: 0.32 } },
+      { id: 'board-1', type: 'mainSwitchboard', name: 'Main Switchboard', enabled: true, position: { x: 430, y: 380 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
+      { id: 'monitor-1', type: 'energyMonitor', name: 'Energy Monitor (CT)', enabled: true, position: { x: 430, y: 240 }, maxPowerW: 0, currentPowerW: 0, config: { monitoredCircuits: ['solar', 'grid', 'ev', 'total'] } },
+      { id: 'solar-1', type: 'solarPanel', name: 'Solar Panels', enabled: true, position: { x: 240, y: 100 }, maxPowerW: 10000, currentPowerW: 0, config: { panelCount: 24, panelWattage: 415, roofAngle: 22, roofOrientation: 0 } },
+      { id: 'inverter-1', type: 'inverter', name: 'Hybrid Inverter', enabled: true, position: { x: 240, y: 240 }, maxPowerW: 10000, currentPowerW: 0, config: { maxOutputW: 10000, efficiency: 0.97, hybridMode: false } },
+      { id: 'ev-1', type: 'evCharger', name: 'EV Charger', enabled: true, position: { x: 800, y: 380 }, maxPowerW: 7400, currentPowerW: 0, config: { maxCurrentA: 32, phases: 1, voltage: 230, chargingStandard: 'ocpp201', chargingMode: 'solar_only', isCharging: true, evBatteryPercent: 35, evCapacityKwh: 60, evEfficiencyKmPerKwh: 6, evSessionKwh: 0 } },
+      { id: 'load-1', type: 'homeLoad', name: 'Home Consumption', enabled: true, position: { x: 620, y: 380 }, maxPowerW: 15000, currentPowerW: -1500, config: { baseLoadW: 1500 } },
     ],
     simulation: { timeOfDay: 11, cloudCover: 0.1, season: 'summer', isRunning: false, speedMultiplier: 1, temperature: 27 },
   },
@@ -235,15 +235,15 @@ export const scenarioPresets: ScenarioPreset[] = [
     context:
       'This is the scenario where the interplay between components matters most. The grid meter sees the net flow at the property boundary. The energy monitor gives the HEMS real-time data to make smart decisions across all four devices.',
     components: [
-      { id: 'grid-1', type: 'grid', name: 'Power Grid', enabled: true, position: { x: 60, y: 290 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
-      { id: 'meter-1', type: 'gridMeter', name: 'Grid Meter (NMI)', enabled: true, position: { x: 195, y: 290 }, maxPowerW: 25000, currentPowerW: 0, config: { gridExportLimitW: 5000, feedInTariff: 0.05, importTariff: 0.32 } },
-      { id: 'board-1', type: 'mainSwitchboard', name: 'Main Switchboard', enabled: true, position: { x: 380, y: 290 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
-      { id: 'monitor-1', type: 'energyMonitor', name: 'Energy Monitor (CT)', enabled: true, position: { x: 380, y: 170 }, maxPowerW: 0, currentPowerW: 0, config: { monitoredCircuits: ['solar', 'grid', 'ev', 'total'] } },
-      { id: 'solar-1', type: 'solarPanel', name: 'Solar Panels', enabled: true, position: { x: 245, y: 80 }, maxPowerW: 10000, currentPowerW: 0, config: { panelCount: 24, panelWattage: 415, roofAngle: 25, roofOrientation: 0 } },
-      { id: 'inverter-1', type: 'inverter', name: 'Hybrid Inverter', enabled: true, position: { x: 130, y: 170 }, maxPowerW: 10000, currentPowerW: 0, config: { maxOutputW: 10000, efficiency: 0.97, hybridMode: true } },
-      { id: 'battery-1', type: 'battery', name: 'Home Battery', enabled: true, position: { x: 60, y: 170 }, maxPowerW: 5000, currentPowerW: 0, config: { capacityKwh: 13.5, currentSocPercent: 40, maxChargeRateW: 5000, maxDischargeRateW: 5000 } },
-      { id: 'ev-1', type: 'evCharger', name: 'EV Charger', enabled: true, position: { x: 560, y: 170 }, maxPowerW: 7400, currentPowerW: 0, config: { maxCurrentA: 32, phases: 1, voltage: 230, chargingStandard: 'ocpp201', chargingMode: 'eco', isCharging: true, evBatteryPercent: 50, evCapacityKwh: 60, evEfficiencyKmPerKwh: 6, evSessionKwh: 0 } },
-      { id: 'load-1', type: 'homeLoad', name: 'Home Consumption', enabled: true, position: { x: 500, y: 290 }, maxPowerW: 15000, currentPowerW: -2000, config: { baseLoadW: 2000 } },
+      { id: 'grid-1', type: 'grid', name: 'Power Grid', enabled: true, position: { x: 80, y: 380 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
+      { id: 'meter-1', type: 'gridMeter', name: 'Grid Meter (NMI)', enabled: true, position: { x: 240, y: 380 }, maxPowerW: 25000, currentPowerW: 0, config: { gridExportLimitW: 5000, feedInTariff: 0.05, importTariff: 0.32 } },
+      { id: 'board-1', type: 'mainSwitchboard', name: 'Main Switchboard', enabled: true, position: { x: 430, y: 380 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
+      { id: 'monitor-1', type: 'energyMonitor', name: 'Energy Monitor (CT)', enabled: true, position: { x: 430, y: 240 }, maxPowerW: 0, currentPowerW: 0, config: { monitoredCircuits: ['solar', 'grid', 'ev', 'total'] } },
+      { id: 'solar-1', type: 'solarPanel', name: 'Solar Panels', enabled: true, position: { x: 240, y: 100 }, maxPowerW: 10000, currentPowerW: 0, config: { panelCount: 24, panelWattage: 415, roofAngle: 25, roofOrientation: 0 } },
+      { id: 'inverter-1', type: 'inverter', name: 'Hybrid Inverter', enabled: true, position: { x: 240, y: 240 }, maxPowerW: 10000, currentPowerW: 0, config: { maxOutputW: 10000, efficiency: 0.97, hybridMode: true } },
+      { id: 'battery-1', type: 'battery', name: 'Home Battery', enabled: true, position: { x: 80, y: 240 }, maxPowerW: 5000, currentPowerW: 0, config: { capacityKwh: 13.5, currentSocPercent: 40, maxChargeRateW: 5000, maxDischargeRateW: 5000 } },
+      { id: 'ev-1', type: 'evCharger', name: 'EV Charger', enabled: true, position: { x: 800, y: 380 }, maxPowerW: 7400, currentPowerW: 0, config: { maxCurrentA: 32, phases: 1, voltage: 230, chargingStandard: 'ocpp201', chargingMode: 'eco', isCharging: true, evBatteryPercent: 50, evCapacityKwh: 60, evEfficiencyKmPerKwh: 6, evSessionKwh: 0 } },
+      { id: 'load-1', type: 'homeLoad', name: 'Home Consumption', enabled: true, position: { x: 620, y: 380 }, maxPowerW: 15000, currentPowerW: -2000, config: { baseLoadW: 2000 } },
     ],
     simulation: { timeOfDay: 13, cloudCover: 0.2, season: 'summer', isRunning: false, speedMultiplier: 1, temperature: 25 },
   },
@@ -258,26 +258,56 @@ export const scenarioPresets: ScenarioPreset[] = [
     context:
       'Zero-export mode is configured in the inverter settings, with a CT clamp on the grid connection providing real-time feedback. The energy monitor is essential here — without it, the inverter cannot know when to throttle.',
     components: [
-      { id: 'grid-1', type: 'grid', name: 'Power Grid', enabled: true, position: { x: 60, y: 290 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
-      { id: 'meter-1', type: 'gridMeter', name: 'Grid Meter (NMI)', enabled: true, position: { x: 195, y: 290 }, maxPowerW: 25000, currentPowerW: 0, config: { gridExportLimitW: 0, feedInTariff: 0, importTariff: 0.32 } },
-      { id: 'board-1', type: 'mainSwitchboard', name: 'Main Switchboard', enabled: true, position: { x: 380, y: 290 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
-      { id: 'monitor-1', type: 'energyMonitor', name: 'Energy Monitor (CT)', enabled: true, position: { x: 380, y: 170 }, maxPowerW: 0, currentPowerW: 0, config: { monitoredCircuits: ['solar', 'grid', 'total'] } },
-      { id: 'solar-1', type: 'solarPanel', name: 'Solar Panels', enabled: true, position: { x: 245, y: 80 }, maxPowerW: 6600, currentPowerW: 0, config: { panelCount: 16, panelWattage: 415, roofAngle: 15, roofOrientation: 0 } },
-      { id: 'inverter-1', type: 'inverter', name: 'Hybrid Inverter', enabled: true, position: { x: 130, y: 170 }, maxPowerW: 5000, currentPowerW: 0, config: { maxOutputW: 5000, efficiency: 0.97, hybridMode: true } },
-      { id: 'battery-1', type: 'battery', name: 'Home Battery', enabled: true, position: { x: 60, y: 170 }, maxPowerW: 5000, currentPowerW: 0, config: { capacityKwh: 10, currentSocPercent: 20, maxChargeRateW: 5000, maxDischargeRateW: 5000 } },
-      { id: 'load-1', type: 'homeLoad', name: 'Home Consumption', enabled: true, position: { x: 500, y: 290 }, maxPowerW: 15000, currentPowerW: -1500, config: { baseLoadW: 1500 } },
+      { id: 'grid-1', type: 'grid', name: 'Power Grid', enabled: true, position: { x: 80, y: 380 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
+      { id: 'meter-1', type: 'gridMeter', name: 'Grid Meter (NMI)', enabled: true, position: { x: 240, y: 380 }, maxPowerW: 25000, currentPowerW: 0, config: { gridExportLimitW: 0, feedInTariff: 0, importTariff: 0.32 } },
+      { id: 'board-1', type: 'mainSwitchboard', name: 'Main Switchboard', enabled: true, position: { x: 430, y: 380 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
+      { id: 'monitor-1', type: 'energyMonitor', name: 'Energy Monitor (CT)', enabled: true, position: { x: 430, y: 240 }, maxPowerW: 0, currentPowerW: 0, config: { monitoredCircuits: ['solar', 'grid', 'total'] } },
+      { id: 'solar-1', type: 'solarPanel', name: 'Solar Panels', enabled: true, position: { x: 240, y: 100 }, maxPowerW: 6600, currentPowerW: 0, config: { panelCount: 16, panelWattage: 415, roofAngle: 15, roofOrientation: 0 } },
+      { id: 'inverter-1', type: 'inverter', name: 'Hybrid Inverter', enabled: true, position: { x: 240, y: 240 }, maxPowerW: 5000, currentPowerW: 0, config: { maxOutputW: 5000, efficiency: 0.97, hybridMode: true } },
+      { id: 'battery-1', type: 'battery', name: 'Home Battery', enabled: true, position: { x: 80, y: 240 }, maxPowerW: 5000, currentPowerW: 0, config: { capacityKwh: 10, currentSocPercent: 20, maxChargeRateW: 5000, maxDischargeRateW: 5000 } },
+      { id: 'load-1', type: 'homeLoad', name: 'Home Consumption', enabled: true, position: { x: 620, y: 380 }, maxPowerW: 15000, currentPowerW: -1500, config: { baseLoadW: 1500 } },
     ],
     simulation: { timeOfDay: 10, cloudCover: 0.1, season: 'summer', isRunning: false, speedMultiplier: 1, temperature: 24 },
+  },
+  {
+    id: 'ev-no-ct',
+    name: 'EV Charging — No CT Clamp (Manual Rate)',
+    icon: '🔌',
+    tagline: 'Solar + EV but no energy monitor — limited control',
+    description:
+      'An EV owner with solar but no CT clamp or energy monitor. Without real-time solar surplus data, the charger cannot dynamically follow solar production. The homeowner must set a fixed charging current manually — typically 6–10A to stay "roughly" within solar output. When solar drops (clouds, afternoon), the grid automatically fills in and the homeowner has no way to prevent it.',
+    goal: 'Understand the cost of not having a CT clamp. Compare grid import here vs the Solar + EV (CT Clamp) scenario to see the dollar difference.',
+    context:
+      'Without a CT clamp, smart charging features like "Solar Only" or "Eco" mode are unavailable. The charger runs at a fixed user-set current regardless of solar conditions. Installing a CT clamp ($150–300 for Shelly EM or Emporia Vue) enables dynamic solar charging and can pay for itself within months.',
+    components: [
+      { id: 'grid-1', type: 'grid', name: 'Power Grid', enabled: true, position: { x: 80, y: 380 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
+      { id: 'meter-1', type: 'gridMeter', name: 'Grid Meter (NMI)', enabled: true, position: { x: 240, y: 380 }, maxPowerW: 25000, currentPowerW: 0, config: { gridExportLimitW: 5000, feedInTariff: 0.05, importTariff: 0.32 } },
+      { id: 'board-1', type: 'mainSwitchboard', name: 'Main Switchboard', enabled: true, position: { x: 430, y: 380 }, maxPowerW: 25000, currentPowerW: 0, config: {} },
+      { id: 'solar-1', type: 'solarPanel', name: 'Solar Panels', enabled: true, position: { x: 240, y: 100 }, maxPowerW: 10000, currentPowerW: 0, config: { panelCount: 24, panelWattage: 415, roofAngle: 22, roofOrientation: 0 } },
+      { id: 'inverter-1', type: 'inverter', name: 'String Inverter', enabled: true, position: { x: 240, y: 240 }, maxPowerW: 10000, currentPowerW: 0, config: { maxOutputW: 10000, efficiency: 0.97, hybridMode: false } },
+      { id: 'ev-1', type: 'evCharger', name: 'EV Charger (Fixed 10A)', enabled: true, position: { x: 800, y: 380 }, maxPowerW: 2300, currentPowerW: 0, config: { maxCurrentA: 10, phases: 1, voltage: 230, chargingStandard: 'ocpp16', chargingMode: 'fast', isCharging: true, evBatteryPercent: 30, evCapacityKwh: 60, evEfficiencyKmPerKwh: 6, evSessionKwh: 0 } },
+      { id: 'load-1', type: 'homeLoad', name: 'Home Consumption', enabled: true, position: { x: 620, y: 380 }, maxPowerW: 15000, currentPowerW: -1500, config: { baseLoadW: 1500 } },
+    ],
+    simulation: { timeOfDay: 13, cloudCover: 0.35, season: 'summer', isRunning: false, speedMultiplier: 1, temperature: 26 },
   },
 ];
 
 // ─── Store interface ───────────────────────────────────────────────────────────
+
+export interface SessionStats {
+  solarKwh: number;
+  importKwh: number;
+  exportKwh: number;
+  homeKwh: number;
+  evKwh: number;
+}
 
 interface EnergyStore {
   components: EnergyComponent[];
   simulation: SimulationState;
   powerFlows: PowerFlow[];
   summary: SystemSummary;
+  sessionStats: SessionStats;
   userLevel: UserLevel;
   selectedComponentId: string | null;
   activeTab: 'simulator' | 'scenarios' | 'learn' | 'protocols' | 'strategies';
@@ -296,6 +326,7 @@ interface EnergyStore {
   loadScenario: (scenarioId: string) => void;
   recalculate: () => void;
   resetToDefault: () => void;
+  resetSessionStats: () => void;
 }
 
 // ─── Store ────────────────────────────────────────────────────────────────────
@@ -313,6 +344,7 @@ export const useEnergyStore = create<EnergyStore>((set, get) => ({
     selfConsumptionPercent: 0,
     autarkyPercent: 0,
   },
+  sessionStats: { solarKwh: 0, importKwh: 0, exportKwh: 0, homeKwh: 0, evKwh: 0 },
   userLevel: 'beginner',
   selectedComponentId: null,
   activeTab: 'simulator',
@@ -380,15 +412,36 @@ export const useEnergyStore = create<EnergyStore>((set, get) => ({
       selectedComponentId: null,
       activeScenarioId: scenarioId,
       activeTab: 'simulator',
+      sessionStats: { solarKwh: 0, importKwh: 0, exportKwh: 0, homeKwh: 0, evKwh: 0 },
     });
     get().recalculate();
   },
 
   recalculate: () => {
-    const { components, simulation } = get();
+    const { components, simulation, sessionStats } = get();
     const { flows, updatedComponents } = calculatePowerFlows(components, simulation);
     const summary = calculateSummary(updatedComponents, flows);
-    set({ powerFlows: flows, components: updatedComponents, summary });
+
+    // Accumulate session energy only while running (each tick = 0.05 * speed simulated hours)
+    let newSessionStats = sessionStats;
+    if (simulation.isRunning) {
+      const deltaHours = 0.05 * simulation.speedMultiplier;
+      newSessionStats = {
+        solarKwh: sessionStats.solarKwh + (summary.totalSolarGenerationW / 1000) * deltaHours,
+        importKwh: sessionStats.importKwh + (summary.gridImportW / 1000) * deltaHours,
+        exportKwh: sessionStats.exportKwh + (summary.gridExportW / 1000) * deltaHours,
+        homeKwh: sessionStats.homeKwh + (summary.totalConsumptionW / 1000) * deltaHours,
+        evKwh: sessionStats.evKwh + (updatedComponents
+          .filter((c) => c.type === 'evCharger' && c.enabled)
+          .reduce((sum, c) => sum + Math.abs(c.currentPowerW), 0) / 1000) * deltaHours,
+      };
+    }
+
+    set({ powerFlows: flows, components: updatedComponents, summary, sessionStats: newSessionStats });
+  },
+
+  resetSessionStats: () => {
+    set({ sessionStats: { solarKwh: 0, importKwh: 0, exportKwh: 0, homeKwh: 0, evKwh: 0 } });
   },
 
   resetToDefault: () => {
@@ -398,6 +451,7 @@ export const useEnergyStore = create<EnergyStore>((set, get) => ({
       powerFlows: [],
       selectedComponentId: null,
       activeScenarioId: null,
+      sessionStats: { solarKwh: 0, importKwh: 0, exportKwh: 0, homeKwh: 0, evKwh: 0 },
     });
     get().recalculate();
   },

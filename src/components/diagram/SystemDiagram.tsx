@@ -205,7 +205,7 @@ export default function SystemDiagram() {
   return (
     <div style={{ width: '100%', background: '#0f172a', borderRadius: 12, overflow: 'hidden' }}>
       <svg
-        viewBox="0 0 800 550"
+        viewBox="0 0 1100 490"
         width="100%"
         height="100%"
         style={{ display: 'block' }}
@@ -237,7 +237,7 @@ export default function SystemDiagram() {
           </linearGradient>
         </defs>
 
-        <rect width="800" height="550" fill="url(#bg-gradient)" />
+        <rect width="1100" height="490" fill="url(#bg-gradient)" />
 
         {powerFlows.map((flow) => (
           <FlowLine

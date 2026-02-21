@@ -3,6 +3,7 @@ import { useEnergyStore } from './store/energyStore';
 import SystemDiagram from './components/diagram/SystemDiagram';
 import SimulationControls from './components/diagram/SimulationControls';
 import SystemSummary from './components/panels/SystemSummary';
+import SessionStatsPanel from './components/panels/SessionStatsPanel';
 import ComponentEditor from './components/panels/ComponentEditor';
 import AddComponentPanel from './components/panels/AddComponentPanel';
 import LearnSection from './components/education/LearnSection';
@@ -89,6 +90,7 @@ function App() {
         {activeTab === 'simulator' && (
           <div>
             <SystemSummary />
+            <SessionStatsPanel />
             <div style={{ display: 'flex', gap: '16px', marginTop: '16px' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <SystemDiagram />
