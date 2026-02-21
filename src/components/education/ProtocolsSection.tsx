@@ -367,6 +367,24 @@ FC16 - Write Multiple Registers (set a range of values)`}
           <strong style={{ color: '#bb9af7' }}>How it enables solar charging:</strong> The energy management system (acting as or communicating with a CSMS) reads current solar surplus from the inverter/meter, calculates available power for EV charging, and sends a SetChargingProfile message to the charger with the updated power limit. The charger adjusts its output accordingly, typically updated every 5–60 seconds.
         </p>
 
+        <div
+          style={{
+            backgroundColor: '#16213e',
+            borderRadius: 6,
+            padding: 12,
+            border: '1px solid #1e3a5f',
+            marginBottom: 12,
+          }}
+        >
+          <strong style={{ color: '#7aa2f7' }}>Australian market context:</strong>
+          <p style={{ margin: '6px 0 0', fontSize: 13 }}>
+            Most residential EV chargers sold in Australia today support <strong>OCPP 1.6</strong>, which is sufficient for basic smart charging and solar integration. <strong>OCPP 2.0.1</strong> — required for ISO 15118 Plug &amp; Charge and bidirectional V2G charging — is only just beginning to appear in the Australian market (2024–2025).
+          </p>
+          <p style={{ margin: '6px 0 0', fontSize: 13 }}>
+            AEMO and ARENA have run smart charging trials using OCPP as the control protocol, treating home chargers as flexible loads. This positions OCPP as the likely standard for any future grid-interactive EV charging programs in Australia. When choosing a charger, OCPP 1.6 support is sufficient for current solar charging needs; OCPP 2.0.1 is worth prioritising if you anticipate participating in V2G or future demand response programs.
+          </p>
+        </div>
+
         {userLevel === 'beginner' && (
           <div
             style={{

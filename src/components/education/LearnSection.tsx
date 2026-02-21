@@ -682,6 +682,231 @@ export default function LearnSection() {
         </>
       ),
     },
+    {
+      title: '🔌 Home EV Charger Features — What Does a Smart Charger Actually Do?',
+      content: (
+        <>
+          <p style={{ margin: '0 0 10px' }}>
+            Not all home EV chargers are equal. A basic charger gives you a fixed power output. A smart charger actively communicates with your home energy system and adjusts charging in real time.
+          </p>
+          <p style={{ margin: '0 0 8px' }}>
+            <strong style={{ color: '#bb9af7' }}>Basic features (all home chargers):</strong>
+          </p>
+          <ul style={{ margin: '0 0 10px', paddingLeft: 20 }}>
+            <li style={{ marginBottom: 4 }}>Fixed power output at the rated amperage (e.g. 16A or 32A)</li>
+            <li style={{ marginBottom: 4 }}>Scheduled charging — start/stop at a time you set in an app</li>
+            <li style={{ marginBottom: 4 }}>Session energy logging</li>
+          </ul>
+          <p style={{ margin: '0 0 8px' }}>
+            <strong style={{ color: '#bb9af7' }}>Smart / high-end features:</strong>
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
+            <div style={{ backgroundColor: '#1a1a2e', borderRadius: 6, padding: 12, borderLeft: '3px solid #9ece6a' }}>
+              <strong style={{ color: '#9ece6a' }}>Dynamic current adjustment</strong>
+              <p style={{ margin: '6px 0 0', fontSize: 13 }}>
+                The charger continuously adjusts its current (e.g. 6A–32A) based on signals from the energy monitor. This is the core mechanism for solar-only charging — the charger follows the solar surplus curve in real time.
+              </p>
+            </div>
+            <div style={{ backgroundColor: '#1a1a2e', borderRadius: 6, padding: 12, borderLeft: '3px solid #7aa2f7' }}>
+              <strong style={{ color: '#7aa2f7' }}>App remote control + OTA updates</strong>
+              <p style={{ margin: '6px 0 0', fontSize: 13 }}>
+                Start/stop sessions remotely, configure charging modes, receive firmware updates over the air. Keeps the charger up to date with new protocols and features without an electrician visit.
+              </p>
+            </div>
+            <div style={{ backgroundColor: '#1a1a2e', borderRadius: 6, padding: 12, borderLeft: '3px solid #bb9af7' }}>
+              <strong style={{ color: '#bb9af7' }}>Plug & Charge (ISO 15118)</strong>
+              <p style={{ margin: '6px 0 0', fontSize: 13 }}>
+                The EV and charger authenticate each other automatically via TLS certificates the moment the cable is plugged in — no RFID card or app needed. Required for future V2G (bidirectional) charging.
+              </p>
+            </div>
+            <div style={{ backgroundColor: '#1a1a2e', borderRadius: 6, padding: 12, borderLeft: '3px solid #e0af68' }}>
+              <strong style={{ color: '#e0af68' }}>OCPP 2.0.1 smart charging</strong>
+              <p style={{ margin: '6px 0 0', fontSize: 13 }}>
+                Enables a central management system (CSMS) to send time-stamped power schedules to the charger. The charger executes the schedule independently — even if the network drops. Required for grid demand response and VPP participation.
+              </p>
+            </div>
+          </div>
+          <p style={{ margin: '0 0 8px' }}>
+            <strong style={{ color: '#bb9af7' }}>Is it safe to dynamically adjust the charging current?</strong>
+          </p>
+          <p style={{ margin: '0 0 8px', fontSize: 13 }}>
+            Yes — provided the charger and EV use a standard communication protocol (PWM pilot signal on Mode 2/3 cables, or ISO 15118 on CCS). The charger signals the maximum available current via the pilot; the EV always draws only what it can safely accept. The charger cannot force the EV to draw more than it requests.
+          </p>
+          <p style={{ margin: 0, color: '#73daca', fontSize: 13 }}>
+            <strong>One hard rule:</strong> Most EVs will not accept a charge below 6A (1.4 kW single-phase). If solar surplus drops below this threshold, a smart charger must either pause the session or bridge the gap from the grid (Eco mode), not try to charge at 3A.
+          </p>
+        </>
+      ),
+    },
+    {
+      title: '☀️🔄 Solar Inverter + EV Charger Integration — Do They Need to Be the Same Brand?',
+      content: (
+        <>
+          <p style={{ margin: '0 0 10px' }}>
+            A common question from solar owners adding an EV charger: <em>"Do I need a Fronius/SMA/Huawei charger to work with my Fronius/SMA/Huawei inverter?"</em> The short answer is <strong>no</strong> — but understanding why requires knowing which device actually controls the charging.
+          </p>
+          <div style={{ backgroundColor: '#16161e', borderRadius: 6, padding: 12, marginBottom: 12, fontFamily: 'monospace', fontSize: 12, color: '#9ece6a', lineHeight: 1.9 }}>
+            Solar Panels → Inverter (DC→AC) → Main Switchboard<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↑<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Energy Monitor (CT clamp)<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓ real-time data<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EV Charger ← adjusts current
+          </div>
+          <p style={{ margin: '0 0 8px' }}>
+            <strong style={{ color: '#bb9af7' }}>The inverter's role:</strong> Convert DC to AC and synchronise with the grid. It does not decide how much power the EV charger draws. That decision comes from the <strong>energy monitor</strong> (CT clamp) and the <strong>charger's own control logic</strong>.
+          </p>
+          <p style={{ margin: '0 0 8px' }}>
+            <strong style={{ color: '#bb9af7' }}>What actually enables solar-only EV charging:</strong>
+          </p>
+          <ul style={{ margin: '0 0 10px', paddingLeft: 20 }}>
+            <li style={{ marginBottom: 4 }}>
+              <strong>A CT clamp / energy monitor</strong> at the switchboard measures solar surplus in real time
+            </li>
+            <li style={{ marginBottom: 4 }}>
+              <strong>The EV charger</strong> reads this data (directly via Modbus, or via a HEMS/cloud relay) and adjusts its charge current accordingly
+            </li>
+            <li style={{ marginBottom: 4 }}>
+              The inverter brand is irrelevant to this process — it just produces AC power
+            </li>
+          </ul>
+          <p style={{ margin: '0 0 8px' }}>
+            <strong style={{ color: '#bb9af7' }}>Same-brand advantage (e.g. Fronius Wattpilot + Fronius Smart Meter):</strong>
+          </p>
+          <ul style={{ margin: '0 0 10px', paddingLeft: 20 }}>
+            <li style={{ marginBottom: 4 }}>Plug-and-play setup — no manual configuration</li>
+            <li style={{ marginBottom: 4 }}>Single app for inverter + charger</li>
+            <li style={{ marginBottom: 4 }}>Tighter integration, faster update cycles</li>
+          </ul>
+          <p style={{ margin: '0 0 8px' }}>
+            <strong style={{ color: '#bb9af7' }}>Open-standard alternative:</strong>
+          </p>
+          <ul style={{ margin: '0 0 10px', paddingLeft: 20 }}>
+            <li style={{ marginBottom: 4 }}>Any CT clamp that exposes Modbus or MQTT (e.g. Shelly EM, IoTaWatt)</li>
+            <li style={{ marginBottom: 4 }}>Any OCPP-compatible charger (Myenergi Zappi, Ocular IQ, Smappee)</li>
+            <li style={{ marginBottom: 4 }}>Optionally a HEMS like Home Assistant to orchestrate everything</li>
+            <li style={{ marginBottom: 4 }}>Advantages: swap brands freely, support any EV, integrate third-party platforms</li>
+          </ul>
+          <p style={{ margin: 0, color: '#73daca', fontSize: 13 }}>
+            <strong>Bottom line:</strong> If you already have a Fronius inverter, a Fronius Wattpilot is the easiest path. But you are not locked in. Any smart charger that reads a CT clamp or HEMS data can achieve the same solar-priority charging result.
+          </p>
+        </>
+      ),
+    },
+    {
+      title: '☁️ Cloud vs Local — What Happens When the Internet Goes Down?',
+      content: (
+        <>
+          <p style={{ margin: '0 0 10px' }}>
+            Many smart home energy products rely on cloud servers for their apps and control logic. It is important to know which functions require the internet and which run entirely on your local network.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+            <div style={{ backgroundColor: '#1a1a2e', borderRadius: 6, padding: 12, borderLeft: '3px solid #f7768e' }}>
+              <strong style={{ color: '#f7768e' }}>Breaks without internet</strong>
+              <ul style={{ margin: '6px 0 0', paddingLeft: 16, fontSize: 13 }}>
+                <li style={{ marginBottom: 3 }}>Remote app control (start/stop from outside home)</li>
+                <li style={{ marginBottom: 3 }}>Cloud-based energy history &amp; dashboards</li>
+                <li style={{ marginBottom: 3 }}>OTA firmware updates</li>
+                <li style={{ marginBottom: 3 }}>Solar forecasting (weather data)</li>
+                <li>Dynamic electricity price feeds</li>
+              </ul>
+            </div>
+            <div style={{ backgroundColor: '#1a1a2e', borderRadius: 6, padding: 12, borderLeft: '3px solid #9ece6a' }}>
+              <strong style={{ color: '#9ece6a' }}>Continues to work locally</strong>
+              <ul style={{ margin: '6px 0 0', paddingLeft: 16, fontSize: 13 }}>
+                <li style={{ marginBottom: 3 }}>Solar production &amp; EV charging</li>
+                <li style={{ marginBottom: 3 }}>Dynamic solar-only charging (CT clamp local loop)</li>
+                <li style={{ marginBottom: 3 }}>OCPP charging schedules already downloaded</li>
+                <li style={{ marginBottom: 3 }}>Battery charge/discharge cycles</li>
+                <li>Heat pump operation</li>
+              </ul>
+            </div>
+          </div>
+          <p style={{ margin: '0 0 8px' }}>
+            <strong style={{ color: '#bb9af7' }}>Why solar-only EV charging works offline:</strong> The CT clamp, EV charger, and their communication happen entirely on your local network (or even via direct wiring/Modbus). There is no cloud in the loop for the real-time current adjustment. The cloud is only needed for historical logging and remote app access.
+          </p>
+          <p style={{ margin: '0 0 8px' }}>
+            <strong style={{ color: '#bb9af7' }}>Best practice for resilience:</strong>
+          </p>
+          <ul style={{ margin: '0 0 10px', paddingLeft: 20 }}>
+            <li style={{ marginBottom: 4 }}>Ensure your EV charger can run its charging logic locally (check manufacturer specs)</li>
+            <li style={{ marginBottom: 4 }}>Use local-first platforms (Home Assistant, local OCPP server) for automation</li>
+            <li style={{ marginBottom: 4 }}>Use cloud only for monitoring dashboards, notifications, and remote access</li>
+            <li style={{ marginBottom: 4 }}>OCPP 2.0.1 allows charging schedules to be downloaded and executed locally on the charger — no server needed once the schedule is set</li>
+          </ul>
+          <p style={{ margin: 0, color: '#73daca', fontSize: 13 }}>
+            A well-designed system keeps the critical control loop (solar → CT clamp → charger) entirely local. The cloud is useful, but it should never be a single point of failure for your daily energy routine.
+          </p>
+        </>
+      ),
+    },
+    {
+      title: '🚗 Recommended Smart EV Chargers for Australian Solar Homes',
+      content: (
+        <>
+          <p style={{ margin: '0 0 10px' }}>
+            These chargers are well-suited to Australian conditions (single-phase grid, 5 kW export limit, Ausgrid/Endeavour/SA Power zones) and support solar-surplus charging without requiring brand lock-in.
+          </p>
+
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>High Integration / Solar-First</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ backgroundColor: '#1a1a2e', borderRadius: 6, padding: 12, borderLeft: '3px solid #9ece6a' }}>
+                <strong style={{ color: '#9ece6a' }}>Myenergi Zappi (7.4 kW / 22 kW)</strong>
+                <p style={{ margin: '4px 0 0', fontSize: 13, lineHeight: 1.6 }}>
+                  Best-in-class solar surplus charging with three modes: Eco (solar + grid top-up), Eco+ (solar only, pauses when surplus drops), and Boost (full speed). Works standalone with an external CT clamp — no inverter brand dependency. App control, OCPP support, future-proof.
+                </p>
+                <div style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>OCPP 1.6 · External CT clamp · App control · 7.4 kW (single phase)</div>
+              </div>
+              <div style={{ backgroundColor: '#1a1a2e', borderRadius: 6, padding: 12, borderLeft: '3px solid #bb9af7' }}>
+                <strong style={{ color: '#bb9af7' }}>Ocular IQ Home Solar Smart Charger</strong>
+                <p style={{ margin: '4px 0 0', fontSize: 13, lineHeight: 1.6 }}>
+                  Australian-made, designed specifically for solar homes. Integrates directly with most inverter brands via Modbus or manufacturer APIs. Supports Home Assistant. Can expand to battery and V2H coordination. Good choice if you want local-first control.
+                </p>
+                <div style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>OCPP 2.0.1 · Modbus · Local API · 7.4 kW</div>
+              </div>
+              <div style={{ backgroundColor: '#1a1a2e', borderRadius: 6, padding: 12, borderLeft: '3px solid #7aa2f7' }}>
+                <strong style={{ color: '#7aa2f7' }}>Smappee EV Wall</strong>
+                <p style={{ margin: '4px 0 0', fontSize: 13, lineHeight: 1.6 }}>
+                  Pairs with the Smappee Energy Monitor (CT clamp) for tight solar integration. Supports dynamic load balancing across multiple chargers. OCPP, local network operation, home energy dashboard. Good for multi-charger households.
+                </p>
+                <div style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>OCPP 1.6/2.0 · CT clamp pairing · 7.4 kW / 22 kW</div>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Value / Easy Setup</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ backgroundColor: '#1a1a2e', borderRadius: 6, padding: 12, borderLeft: '3px solid #e0af68' }}>
+                <strong style={{ color: '#e0af68' }}>Evos 7.4 kW Smart EV Charger</strong>
+                <p style={{ margin: '4px 0 0', fontSize: 13, lineHeight: 1.6 }}>
+                  Budget-friendly, widely available in Australia. App-controlled scheduling, solar-priority mode via CT clamp. Good for straightforward installations where deep HEMS integration is not required.
+                </p>
+                <div style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>App scheduling · CT clamp support · 7.4 kW</div>
+              </div>
+              <div style={{ backgroundColor: '#1a1a2e', borderRadius: 6, padding: 12, borderLeft: '3px solid #73daca' }}>
+                <strong style={{ color: '#73daca' }}>GoodWe HCA G2 (7 kW)</strong>
+                <p style={{ margin: '4px 0 0', fontSize: 13, lineHeight: 1.6 }}>
+                  Best if you already have a GoodWe inverter — native integration with no extra CT clamp needed. GoodWe's SEMS portal handles solar + EV in one dashboard. OCPP for third-party CSMS if needed.
+                </p>
+                <div style={{ fontSize: 12, color: '#6b7280', marginTop: 4 }}>OCPP 1.6 · GoodWe native integration · 7 kW</div>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ padding: '12px 14px', background: '#16161e', borderRadius: 6, borderLeft: '3px solid #7aa2f7', fontSize: 13, color: '#9ca3af', lineHeight: 1.7 }}>
+            <strong style={{ color: '#7aa2f7' }}>Core selection checklist:</strong>
+            <ol style={{ margin: '8px 0 0', paddingLeft: 20 }}>
+              <li style={{ marginBottom: 4 }}>Does it support solar-surplus charging via an external CT clamp or Modbus? (required for solar-only mode)</li>
+              <li style={{ marginBottom: 4 }}>Does it support OCPP 1.6 or 2.0.1? (required for smart charging and future grid services)</li>
+              <li style={{ marginBottom: 4 }}>Can it run its charging logic locally without an internet connection?</li>
+              <li style={{ marginBottom: 4 }}>Is it certified for the Australian market? (check RCM mark, AS/NZS 3000 wiring rules compliance)</li>
+              <li>Does it support OTA firmware updates? (future-proofing for protocol upgrades)</li>
+            </ol>
+          </div>
+        </>
+      ),
+    },
   ];
 
   const visibleSections = sections.filter(

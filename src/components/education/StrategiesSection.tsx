@@ -302,7 +302,8 @@ export default function StrategiesSection() {
           description="Only charges when surplus solar is available. Pauses charging if solar drops below the minimum threshold."
           details={[
             'Best for: Maximizing savings, lowest electricity cost per km',
-            'Uses CT clamp or smart meter data to measure surplus solar in real time',
+            'Requires a CT clamp / energy monitor at the switchboard — without it, the charger cannot see solar surplus',
+            'Uses CT clamp or energy monitor data to measure surplus solar in real time',
             'Minimum charge threshold: typically 1.4 kW (6A × 230V on single phase)',
             'Below 6A most EVs will not accept a charge — the charger must pause',
             'Charge speed varies throughout the day following the solar curve',
