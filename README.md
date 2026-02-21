@@ -1,73 +1,100 @@
-# React + TypeScript + Vite
+# Home Energy Simulator ⚡
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, interactive React application for simulating and visualizing home energy systems. This educational tool allows users to model energy flows between the power grid, solar panels, batteries, EV chargers, and household appliances in real-time.
 
-Currently, two official plugins are available:
+## 🎯 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Interactive System Diagram:** Visually build and observe power flows between various energy components.
+- **Real-time Simulation:** Watch how energy generation, storage, and consumption interact under different conditions.
+- **Component Ecosystem:**
+  - Power Grid & Grid Meters (NMI)
+  - Main Switchboards
+  - Solar Arrays & Inverters
+  - Home Battery Storage
+  - EV Chargers
+  - Heat Pumps & General Loads
+- **Scenario Testing:** Load preset scenarios to understand different energy setups (e.g., high solar export, battery backup).
+- **Educational Content:** Built-in "Learn", "Protocols", and "Strategies" sections to explain energy concepts.
+- **Setup Sharing:** Share your custom energy setup configurations easily via URL or rely on automatic local storage auto-saves.
+- **User Levels:** Toggle between "Beginner" and "Advanced" views to adjust the complexity of information shown.
+- **Theming & Localization:** Full support for Light/Dark themes and multi-language (i18n) interfaces.
 
-## React Compiler
+## 💻 Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Framework:** React 19
+- **Build Tool:** Vite
+- **Language:** TypeScript
+- **State Management:** Zustand
+- **Icons:** Lucide React
+- **Styling:** CSS-in-JS (Inline) / CSS Variables
+- **Utility:** `lz-string` (for URL setup compression)
 
-## Expanding the ESLint configuration
+## 🚀 Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Ensure you have [Node.js](https://nodejs.org/) (v18+ recommended) installed.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Installation
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd home-energy-simulator
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+4. Open your browser and navigate to `http://localhost:5173`.
+
+### Build for Production
+
+To create a production build, run:
+```bash
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+To preview the production build locally:
+```bash
+npm run preview
 ```
+
+## 📂 Project Structure
+
+```text
+src/
+├── components/       # Reusable React components
+│   ├── diagram/      # Simulation canvas and flow visualization
+│   ├── education/    # Learn, protocols, and strategies views
+│   ├── panels/       # Editors, summaries, and stats panels
+│   ├── scenarios/    # Preset scenario selectors
+│   └── toolbar/      # Top-level setup controls
+├── store/            # Zustand state management (energyStore.ts)
+├── types/            # TypeScript interfaces (energy, components)
+├── utils/            # Simulation math and persistence logic
+├── hooks/            # Custom React hooks
+├── i18n/             # Internationalization config and dictionaries
+├── theme/            # Theme context and switching logic
+├── App.tsx           # Main application entry and layout
+└── index.css         # Global styles and theme variables
+```
+
+## 🤝 Contributing
+
+1. Fork the project.
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`).
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`).
+4. Push to the branch (`git push origin feature/AmazingFeature`).
+5. Open a Pull Request.
+
+## 📝 License
+
+This project is intended for educational purposes. See the `LICENSE` file for details (if applicable).
