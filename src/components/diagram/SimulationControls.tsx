@@ -2,8 +2,10 @@ import { useEffect, useRef, useCallback } from 'react';
 import { Play, Pause, Sun, Moon, Cloud } from 'lucide-react';
 import { useEnergyStore } from '../../store/energyStore';
 import type { SimulationState } from '../../types/energy';
+import { useTranslation } from '../../i18n';
 
 type Season = SimulationState['season'];
+
 
 const SEASONS: { value: Season; label: string; icon: string }[] = [
   { value: 'spring', label: 'Spring', icon: '🌱' },
@@ -21,14 +23,14 @@ function formatTime(hours: number): string {
 }
 
 const containerStyle: React.CSSProperties = {
-  background: '#1a1a2e',
+  background: 'var(--bg-secondary)',
   borderRadius: 12,
   padding: '16px 20px',
   display: 'flex',
   flexWrap: 'wrap',
   gap: 20,
   alignItems: 'center',
-  color: '#e2e8f0',
+  color: 'var(--text-primary)',
   fontFamily: 'system-ui, -apple-system, sans-serif',
   fontSize: 13,
 };
@@ -43,13 +45,13 @@ const labelStyle: React.CSSProperties = {
   fontSize: 10,
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
-  color: '#94a3b8',
+  color: 'var(--text-label)',
   fontWeight: 600,
 };
 
 const sliderStyle: React.CSSProperties = {
   width: 140,
-  accentColor: '#3b82f6',
+  accentColor: 'var(--accent-blue)',
   cursor: 'pointer',
 };
 
@@ -64,6 +66,7 @@ const buttonBase: React.CSSProperties = {
 };
 
 export default function SimulationControls() {
+  const { t } = useTranslation();
   const simulation = useEnergyStore((s) => s.simulation);
   const setSimulation = useEnergyStore((s) => s.setSimulation);
 
@@ -103,8 +106,8 @@ export default function SimulationControls() {
           onClick={() => setSimulation({ isRunning: !simulation.isRunning })}
           style={{
             ...buttonBase,
-            background: simulation.isRunning ? '#ef4444' : '#22c55e',
-            color: '#fff',
+            background: simulation.isRunning ? 'var(--accent-red)' : 'var(--accent-green)',
+            color: 'var(--bg-primary)',
             display: 'flex',
             alignItems: 'center',
             gap: 4,
@@ -112,13 +115,13 @@ export default function SimulationControls() {
           }}
         >
           {simulation.isRunning ? <Pause size={14} /> : <Play size={14} />}
-          {simulation.isRunning ? 'Pause' : 'Play'}
+          {simulation.isRunning ? t('sim_pause') : t('sim_play')}
         </button>
       </div>
 
       {/* Speed */}
       <div style={sectionStyle}>
-        <span style={labelStyle}>Speed</span>
+        <span style={labelStyle}>{t('sim_speed')}</span>
         <div style={{ display: 'flex', gap: 4 }}>
           {SPEED_OPTIONS.map((speed) => (
             <button
@@ -126,8 +129,8 @@ export default function SimulationControls() {
               onClick={() => setSimulation({ speedMultiplier: speed })}
               style={{
                 ...buttonBase,
-                background: simulation.speedMultiplier === speed ? '#3b82f6' : '#2d2d44',
-                color: simulation.speedMultiplier === speed ? '#fff' : '#94a3b8',
+                background: simulation.speedMultiplier === speed ? 'var(--accent-blue)' : 'var(--bg-card)',
+                color: simulation.speedMultiplier === speed ? 'var(--bg-primary)' : 'var(--text-label)',
                 padding: '4px 10px',
                 fontSize: 11,
               }}
@@ -142,7 +145,7 @@ export default function SimulationControls() {
       <div style={sectionStyle}>
         <span style={labelStyle}>
           <TimeIcon size={10} style={{ marginRight: 4, verticalAlign: 'middle' }} />
-          Time: {formatTime(simulation.timeOfDay)}
+          {t('sim_time')}: {formatTime(simulation.timeOfDay)}
         </span>
         <input
           type="range"
@@ -159,7 +162,7 @@ export default function SimulationControls() {
       <div style={sectionStyle}>
         <span style={labelStyle}>
           <Cloud size={10} style={{ marginRight: 4, verticalAlign: 'middle' }} />
-          Clouds: {Math.round(simulation.cloudCover * 100)}%
+          {t('sim_clouds')}: {Math.round(simulation.cloudCover * 100)}%
         </span>
         <input
           type="range"
@@ -174,7 +177,7 @@ export default function SimulationControls() {
 
       {/* Season */}
       <div style={sectionStyle}>
-        <span style={labelStyle}>Season</span>
+        <span style={labelStyle}>{t('sim_season')}</span>
         <div style={{ display: 'flex', gap: 4 }}>
           {SEASONS.map((s) => (
             <button
@@ -182,12 +185,12 @@ export default function SimulationControls() {
               onClick={() => setSimulation({ season: s.value })}
               style={{
                 ...buttonBase,
-                background: simulation.season === s.value ? '#3b82f6' : '#2d2d44',
-                color: simulation.season === s.value ? '#fff' : '#94a3b8',
+                background: simulation.season === s.value ? 'var(--accent-blue)' : 'var(--bg-card)',
+                color: simulation.season === s.value ? 'var(--bg-primary)' : 'var(--text-label)',
                 padding: '4px 8px',
                 fontSize: 11,
               }}
-              title={s.label}
+              title={t(`sim_${s.value}` as Parameters<typeof t>[0])}
             >
               {s.icon}
             </button>
@@ -197,8 +200,8 @@ export default function SimulationControls() {
 
       {/* Temperature */}
       <div style={sectionStyle}>
-        <span style={labelStyle}>Temperature</span>
-        <span style={{ fontSize: 16, fontWeight: 700, color: '#f0f0f0' }}>
+        <span style={labelStyle}>{t('sim_temperature')}</span>
+        <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-heading)' }}>
           {simulation.temperature}°C
         </span>
       </div>

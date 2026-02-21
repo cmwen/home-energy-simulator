@@ -1,9 +1,10 @@
 import React from 'react';
 import { useEnergyStore } from '../../store/energyStore';
 import { TrendingUp, TrendingDown, DollarSign, Zap, RotateCcw } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 const panelStyle: React.CSSProperties = {
-  background: '#1a1a2e',
+  background: 'var(--bg-secondary)',
   borderRadius: 12,
   padding: '14px 16px',
   marginTop: 10,
@@ -19,7 +20,7 @@ const headerStyle: React.CSSProperties = {
 const titleStyle: React.CSSProperties = {
   fontSize: 12,
   fontWeight: 700,
-  color: '#94a3b8',
+  color: 'var(--text-muted)',
   textTransform: 'uppercase',
   letterSpacing: '0.06em',
 };
@@ -31,7 +32,7 @@ const gridStyle: React.CSSProperties = {
 };
 
 const statCardStyle: React.CSSProperties = {
-  background: '#242440',
+  background: 'var(--bg-card)',
   borderRadius: 10,
   padding: '10px 14px',
   display: 'flex',
@@ -41,7 +42,7 @@ const statCardStyle: React.CSSProperties = {
 
 const statLabelStyle: React.CSSProperties = {
   fontSize: 10,
-  color: '#9ca3af',
+  color: 'var(--text-label)',
   textTransform: 'uppercase',
   letterSpacing: '0.04em',
   whiteSpace: 'nowrap',
@@ -50,13 +51,13 @@ const statLabelStyle: React.CSSProperties = {
 const statValueStyle: React.CSSProperties = {
   fontSize: 18,
   fontWeight: 700,
-  color: '#e0e0e0',
+  color: 'var(--text-primary)',
   lineHeight: 1.1,
 };
 
 const statSubStyle: React.CSSProperties = {
   fontSize: 11,
-  color: '#6b7280',
+  color: 'var(--text-dim)',
 };
 
 const resetButtonStyle: React.CSSProperties = {
@@ -64,11 +65,11 @@ const resetButtonStyle: React.CSSProperties = {
   alignItems: 'center',
   gap: 4,
   background: 'none',
-  border: '1px solid #2a2a4e',
+  border: '1px solid var(--border)',
   borderRadius: 6,
   padding: '4px 10px',
   cursor: 'pointer',
-  color: '#6b7280',
+  color: 'var(--text-dim)',
   fontSize: 11,
   fontWeight: 600,
 };
@@ -84,6 +85,7 @@ function fmtDollar(dollars: number): string {
 }
 
 export default function SessionStatsPanel() {
+  const { t } = useTranslation();
   const stats = useEnergyStore((s) => s.sessionStats);
   const components = useEnergyStore((s) => s.components);
   const simulation = useEnergyStore((s) => s.simulation);
@@ -117,73 +119,73 @@ export default function SessionStatsPanel() {
     <div style={panelStyle}>
       <div style={headerStyle}>
         <span style={titleStyle}>
-          Session Totals {!simulation.isRunning && !hasData && '— press Play to accumulate'}
+          {t('stats_session_totals')} {!simulation.isRunning && !hasData && ` — ${t('stats_press_play')}`}
         </span>
         {hasData && (
-          <button style={resetButtonStyle} onClick={resetSessionStats} title="Reset session totals">
+          <button style={resetButtonStyle} onClick={resetSessionStats} title={t('stats_reset')}>
             <RotateCcw size={11} />
-            Reset
+            {t('stats_reset')}
           </button>
         )}
       </div>
 
       <div style={gridStyle}>
         {/* Solar generated */}
-        <div style={{ ...statCardStyle, borderLeft: '3px solid #facc15' }}>
-          <Zap size={14} color="#facc15" />
-          <span style={statLabelStyle}>Solar Generated</span>
+        <div style={{ ...statCardStyle, borderLeft: '3px solid var(--accent-yellow)' }}>
+          <Zap size={14} color="var(--accent-yellow)" />
+          <span style={statLabelStyle}>{t('stats_solar_generated')}</span>
           <span style={statValueStyle}>{fmt(stats.solarKwh)}</span>
           <span style={statSubStyle}>
-            {fmt(selfConsumedKwh)} self-used · {fmt(stats.exportKwh)} exported
+            {fmt(selfConsumedKwh)} {t('stats_self_used')} · {fmt(stats.exportKwh)} {t('stats_exported')}
           </span>
         </div>
 
         {/* Grid import */}
-        <div style={{ ...statCardStyle, borderLeft: '3px solid #3b82f6' }}>
-          <TrendingDown size={14} color="#3b82f6" />
-          <span style={statLabelStyle}>Grid Imported</span>
+        <div style={{ ...statCardStyle, borderLeft: '3px solid var(--accent-blue)' }}>
+          <TrendingDown size={14} color="var(--accent-blue)" />
+          <span style={statLabelStyle}>{t('stats_grid_imported')}</span>
           <span style={statValueStyle}>{fmt(stats.importKwh)}</span>
           <span style={statSubStyle} title={`at ${(importTariff * 100).toFixed(0)}¢/kWh`}>
-            Cost: {fmtDollar(importCost)} @ {(importTariff * 100).toFixed(0)}¢
+            {t('stats_cost')}: {fmtDollar(importCost)} @ {(importTariff * 100).toFixed(0)}¢
           </span>
         </div>
 
         {/* Grid export */}
-        <div style={{ ...statCardStyle, borderLeft: '3px solid #22c55e' }}>
-          <TrendingUp size={14} color="#22c55e" />
-          <span style={statLabelStyle}>Grid Exported</span>
+        <div style={{ ...statCardStyle, borderLeft: '3px solid var(--accent-green)' }}>
+          <TrendingUp size={14} color="var(--accent-green)" />
+          <span style={statLabelStyle}>{t('stats_grid_exported')}</span>
           <span style={statValueStyle}>{fmt(stats.exportKwh)}</span>
-          <span style={statSubStyle} title={`at ${(feedInTariff * 100).toFixed(0)}¢/kWh FiT`}>
-            Earned: {fmtDollar(stats.exportKwh * feedInTariff)} @ {(feedInTariff * 100).toFixed(0)}¢ FiT
+          <span style={statSubStyle} title={`at ${(feedInTariff * 100).toFixed(0)}¢/kWh ${t('stats_fit')}`}>
+            {t('stats_earned')}: {fmtDollar(stats.exportKwh * feedInTariff)} @ {(feedInTariff * 100).toFixed(0)}¢ {t('stats_fit')}
           </span>
         </div>
 
         {/* Solar savings */}
-        <div style={{ ...statCardStyle, borderLeft: '3px solid #a78bfa' }}>
-          <DollarSign size={14} color="#a78bfa" />
-          <span style={statLabelStyle}>Solar Value</span>
-          <span style={{ ...statValueStyle, color: '#a78bfa' }}>{fmtDollar(solarSavings)}</span>
-          <span style={statSubStyle}>avoided import + FiT earned</span>
+        <div style={{ ...statCardStyle, borderLeft: '3px solid var(--accent-purple)' }}>
+          <DollarSign size={14} color="var(--accent-purple)" />
+          <span style={statLabelStyle}>{t('stats_solar_value')}</span>
+          <span style={{ ...statValueStyle, color: 'var(--accent-purple)' }}>{fmtDollar(solarSavings)}</span>
+          <span style={statSubStyle}>{t('stats_avoided_import_fit')}</span>
         </div>
 
         {/* Net cost */}
-        <div style={{ ...statCardStyle, borderLeft: `3px solid ${netCost <= 0 ? '#22c55e' : '#f97316'}` }}>
-          <DollarSign size={14} color={netCost <= 0 ? '#22c55e' : '#f97316'} />
-          <span style={statLabelStyle}>Net Grid Cost</span>
-          <span style={{ ...statValueStyle, color: netCost <= 0 ? '#22c55e' : '#f97316' }}>
+        <div style={{ ...statCardStyle, borderLeft: `3px solid ${netCost <= 0 ? 'var(--accent-green)' : 'var(--accent-red)'}` }}>
+          <DollarSign size={14} color={netCost <= 0 ? 'var(--accent-green)' : 'var(--accent-red)'} />
+          <span style={statLabelStyle}>{t('stats_net_grid_cost')}</span>
+          <span style={{ ...statValueStyle, color: netCost <= 0 ? 'var(--accent-green)' : 'var(--accent-red)' }}>
             {netCost <= 0 ? '+' : ''}{fmtDollar(-netCost)}
           </span>
           <span style={statSubStyle}>
-            {netCost <= 0 ? 'net credit (exported more than cost)' : 'import spend minus FiT'}
+            {netCost <= 0 ? t('stats_net_credit') : t('stats_import_minus_fit')}
           </span>
         </div>
 
         {/* Home consumption */}
-        <div style={{ ...statCardStyle, borderLeft: '3px solid #f97316' }}>
-          <Zap size={14} color="#f97316" />
-          <span style={statLabelStyle}>Home Consumed</span>
+        <div style={{ ...statCardStyle, borderLeft: '3px solid var(--accent-red)' }}>
+          <Zap size={14} color="var(--accent-red)" />
+          <span style={statLabelStyle}>{t('stats_home_consumed')}</span>
           <span style={statValueStyle}>{fmt(stats.homeKwh)}</span>
-          <span style={statSubStyle}>total load (incl. EV)</span>
+          <span style={statSubStyle}>{t('stats_total_load')}</span>
         </div>
       </div>
     </div>

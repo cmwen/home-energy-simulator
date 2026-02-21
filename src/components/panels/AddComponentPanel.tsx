@@ -1,5 +1,6 @@
 import React from 'react';
 import { useEnergyStore } from '../../store/energyStore';
+import { useTranslation } from '../../i18n';
 import type { ComponentType } from '../../types/energy';
 
 interface ComponentOption {
@@ -9,21 +10,9 @@ interface ComponentOption {
   singletonOnly: boolean;
 }
 
-const componentOptions: ComponentOption[] = [
-  { type: 'grid', icon: '⚡', label: 'Power Grid', singletonOnly: true },
-  { type: 'gridMeter', icon: '🔌', label: 'Grid Meter (NMI)', singletonOnly: true },
-  { type: 'mainSwitchboard', icon: '🔧', label: 'Switchboard', singletonOnly: true },
-  { type: 'energyMonitor', icon: '📡', label: 'Energy Monitor', singletonOnly: true },
-  { type: 'solarPanel', icon: '☀️', label: 'Solar Panels', singletonOnly: false },
-  { type: 'inverter', icon: '🔄', label: 'Inverter', singletonOnly: false },
-  { type: 'battery', icon: '🔋', label: 'Battery', singletonOnly: false },
-  { type: 'evCharger', icon: '🚗', label: 'EV Charger', singletonOnly: false },
-  { type: 'homeLoad', icon: '🏠', label: 'Home Load', singletonOnly: false },
-  { type: 'heatPump', icon: '♨️', label: 'Heat Pump', singletonOnly: false },
-];
 
 const panelStyle: React.CSSProperties = {
-  background: '#1a1a2e',
+  background: 'var(--bg-secondary)',
   borderRadius: 12,
   padding: 16,
   display: 'flex',
@@ -34,7 +23,7 @@ const panelStyle: React.CSSProperties = {
 const titleStyle: React.CSSProperties = {
   fontSize: 14,
   fontWeight: 700,
-  color: '#e0e0e0',
+  color: 'var(--text-heading)',
   margin: 0,
 };
 
@@ -51,11 +40,11 @@ function getButtonStyle(disabled: boolean): React.CSSProperties {
     alignItems: 'center',
     gap: 6,
     padding: '12px 8px',
-    background: disabled ? '#1e1e2e' : '#242440',
+    background: disabled ? 'var(--badge-bg)' : 'var(--bg-card)',
     border: '1px solid',
-    borderColor: disabled ? '#2a2a3e' : '#3a3a5e',
+    borderColor: disabled ? 'var(--border-card)' : 'var(--border-input)',
     borderRadius: 10,
-    color: disabled ? '#4b5563' : '#d1d5db',
+    color: disabled ? 'var(--text-muted)' : 'var(--text-primary)',
     cursor: disabled ? 'not-allowed' : 'pointer',
     fontSize: 12,
     opacity: disabled ? 0.5 : 1,
@@ -65,13 +54,27 @@ function getButtonStyle(disabled: boolean): React.CSSProperties {
 
 const countBadgeStyle: React.CSSProperties = {
   fontSize: 10,
-  color: '#9ca3af',
-  background: '#1e1e2e',
+  color: 'var(--text-label)',
+  background: 'var(--badge-bg)',
   borderRadius: 8,
   padding: '1px 6px',
 };
 
 export function AddComponentPanel() {
+  const { t } = useTranslation();
+
+  const componentOptions: ComponentOption[] = [
+    { type: 'grid', icon: '⚡', label: t('type_grid'), singletonOnly: true },
+    { type: 'gridMeter', icon: '🔌', label: t('type_grid_meter'), singletonOnly: true },
+    { type: 'mainSwitchboard', icon: '🔧', label: t('add_switchboard'), singletonOnly: true },
+    { type: 'energyMonitor', icon: '📡', label: t('type_energy_monitor'), singletonOnly: true },
+    { type: 'solarPanel', icon: '☀️', label: t('type_solar_panels'), singletonOnly: false },
+    { type: 'inverter', icon: '🔄', label: t('type_inverter'), singletonOnly: false },
+    { type: 'battery', icon: '🔋', label: t('type_battery'), singletonOnly: false },
+    { type: 'evCharger', icon: '🚗', label: t('type_ev_charger'), singletonOnly: false },
+    { type: 'homeLoad', icon: '🏠', label: t('type_home_load'), singletonOnly: false },
+    { type: 'heatPump', icon: '♨️', label: t('type_heat_pump'), singletonOnly: false },
+  ];
   const components = useEnergyStore((s) => s.components);
   const addComponent = useEnergyStore((s) => s.addComponent);
 
@@ -81,7 +84,7 @@ export function AddComponentPanel() {
 
   return (
     <div style={panelStyle}>
-      <h3 style={titleStyle}>Add Component</h3>
+      <h3 style={titleStyle}>{t('add_component')}</h3>
       <div style={gridStyle}>
         {componentOptions.map((option) => {
           const count = countByType(option.type);
@@ -97,14 +100,14 @@ export function AddComponentPanel() {
               }}
               onMouseEnter={(e) => {
                 if (!disabled) {
-                  (e.currentTarget as HTMLButtonElement).style.background = '#2e2e50';
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = '#7c3aed';
+                  (e.currentTarget as HTMLButtonElement).style.background = 'var(--bg-card-hover)';
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--accent-purple)';
                 }
               }}
               onMouseLeave={(e) => {
                 if (!disabled) {
-                  (e.currentTarget as HTMLButtonElement).style.background = '#242440';
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = '#3a3a5e';
+                  (e.currentTarget as HTMLButtonElement).style.background = 'var(--bg-card)';
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border-input)';
                 }
               }}
             >

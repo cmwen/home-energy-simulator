@@ -1,49 +1,16 @@
 import { useState } from 'react';
 import { useEnergyStore, scenarioPresets } from '../../store/energyStore';
 import type { ScenarioPreset } from '../../types/energy';
+import { useTranslation } from '../../i18n';
 
-// What each component type unlocks — shown as a callout inside each scenario card
-const componentUnlocks: Record<string, string[]> = {
-  gridMeter: [
-    'Records import & export for billing (NMI meter)',
-    'Sets the export limit rule (e.g. 5 kW in Ausgrid zones)',
-    'Enables feed-in tariff credit from your retailer',
-  ],
-  energyMonitor: [
-    'Real-time solar surplus visibility for the HEMS',
-    'Required for solar-only EV charging (CT clamp feedback)',
-    'Required for inverter zero-export throttling',
-    'Enables smart battery dispatch decisions',
-  ],
-  mainSwitchboard: [
-    'AC distribution hub — all loads connect here',
-    'EV charger draws from the switchboard, not the inverter',
-    'Both solar (via inverter) and grid feed into the board',
-  ],
-  inverter: [
-    'Converts solar DC to household AC',
-    'Hybrid mode: manages DC-coupled battery charging',
-    'Zero-export mode: throttles output via CT clamp feedback',
-  ],
-  battery: [
-    'Stores surplus solar for evening & overnight use',
-    'Raises self-sufficiency from ~35% to ~80%+ on sunny days',
-    'Can be charged from off-peak grid tariffs overnight',
-  ],
-  evCharger: [
-    'OCPP 2.0.1: smart charging, dynamic load management',
-    'Solar-only mode: charges only when solar surplus > minimum (needs CT clamp)',
-    'Scheduled mode: charges at cheapest off-peak tariff window',
-  ],
-};
-
+// We map component types to their theme colors and icons
 const UNLOCK_COLORS: Record<string, string> = {
-  gridMeter: '#6366f1',
-  energyMonitor: '#ec4899',
-  mainSwitchboard: '#ca8a04',
-  inverter: '#14b8a6',
-  battery: '#10b981',
-  evCharger: '#8b5cf6',
+  gridMeter: 'var(--accent-blue)',
+  energyMonitor: 'var(--accent-red)',
+  mainSwitchboard: 'var(--accent-yellow)',
+  inverter: 'var(--accent-teal)',
+  battery: 'var(--accent-green)',
+  evCharger: 'var(--accent-purple)',
 };
 
 const UNLOCK_ICONS: Record<string, string> = {
@@ -56,29 +23,30 @@ const UNLOCK_ICONS: Record<string, string> = {
 };
 
 function UnlockCallout({ types }: { types: string[] }) {
+  const { t, translations } = useTranslation();
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-        What this setup unlocks
+      <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+        {t('scenarios_what_setup_unlocks')}
       </div>
       {types.map((type) => {
-        const features = componentUnlocks[type];
+        const features = translations.unlock[type as keyof typeof translations.unlock];
         if (!features) return null;
         return (
           <div
             key={type}
             style={{
-              background: '#16161e',
+              background: 'var(--bg-code)',
               borderRadius: 6,
               padding: '8px 10px',
-              borderLeft: `3px solid ${UNLOCK_COLORS[type] ?? '#6b7280'}`,
+              borderLeft: `3px solid ${UNLOCK_COLORS[type] ?? 'var(--text-dim)'}`,
             }}
           >
-            <div style={{ fontSize: 12, fontWeight: 600, color: UNLOCK_COLORS[type] ?? '#e0e0e0', marginBottom: 4 }}>
-              {UNLOCK_ICONS[type]} {type === 'gridMeter' ? 'Grid Meter (NMI)' : type === 'energyMonitor' ? 'Energy Monitor (CT)' : type === 'mainSwitchboard' ? 'Main Switchboard' : type}
+            <div style={{ fontSize: 12, fontWeight: 600, color: UNLOCK_COLORS[type] ?? 'var(--text-primary)', marginBottom: 4 }}>
+              {UNLOCK_ICONS[type]} {type === 'gridMeter' ? t('type_grid_meter') : type === 'energyMonitor' ? t('type_energy_monitor') : type === 'mainSwitchboard' ? t('type_main_switchboard') : type}
             </div>
-            <ul style={{ margin: 0, paddingLeft: 16, fontSize: 12, color: '#c0c0d0', lineHeight: 1.6 }}>
-              {features.map((f, i) => (
+            <ul style={{ margin: 0, paddingLeft: 16, fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              {features.map((f: string, i: number) => (
                 <li key={i}>{f}</li>
               ))}
             </ul>
@@ -98,18 +66,19 @@ function ScenarioCard({
   isActive: boolean;
   onLoad: () => void;
 }) {
+  const { t, translations } = useTranslation();
   const [expanded, setExpanded] = useState(false);
 
   // Derive which "notable" component types are in this scenario for the unlock callout
   const presentTypes = [...new Set(scenario.components.map((c) => c.type as string))].filter(
-    (t) => Object.keys(componentUnlocks).includes(t)
+    (t) => Object.keys(translations.unlock).includes(t)
   );
 
   return (
     <div
       style={{
-        background: isActive ? '#1a1a3e' : '#1e1e2e',
-        border: `1px solid ${isActive ? '#7aa2f7' : '#2a2a3e'}`,
+        background: isActive ? 'var(--bg-card-hover)' : 'var(--bg-card)',
+        border: `1px solid ${isActive ? 'var(--accent-blue)' : 'var(--border)'}`,
         borderRadius: 10,
         padding: 16,
         display: 'flex',
@@ -123,29 +92,43 @@ function ScenarioCard({
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ fontSize: 28 }}>{scenario.icon}</span>
           <div>
-            <div style={{ fontSize: 15, fontWeight: 700, color: '#c0caf5' }}>{scenario.name}</div>
-            <div style={{ fontSize: 12, color: '#7aa2f7', marginTop: 2 }}>{scenario.tagline}</div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-heading)' }}>
+              {t(`scenario_${scenario.id.replace(/-/g, '_')}_name` as Parameters<typeof t>[0]) || scenario.name}
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--accent-blue)', marginTop: 2 }}>
+              {t(`scenario_${scenario.id.replace(/-/g, '_')}_tagline` as Parameters<typeof t>[0]) || scenario.tagline}
+            </div>
           </div>
         </div>
         {isActive && (
-          <span style={{ fontSize: 11, fontWeight: 600, color: '#22c55e', background: '#14532d', padding: '2px 8px', borderRadius: 10, whiteSpace: 'nowrap' }}>
-            Active
+          <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--accent-green)', background: 'color-mix(in srgb, var(--accent-green) 20%, transparent)', padding: '2px 8px', borderRadius: 10, whiteSpace: 'nowrap' }}>
+            {t('scenarios_active')}
           </span>
         )}
       </div>
 
       {/* Description */}
-      <p style={{ margin: 0, fontSize: 13, color: '#9ca3af', lineHeight: 1.6 }}>{scenario.description}</p>
+      <p style={{ margin: 0, fontSize: 13, color: 'var(--text-label)', lineHeight: 1.6 }}>
+        {t(`scenario_${scenario.id.replace(/-/g, '_')}_description` as Parameters<typeof t>[0]) || scenario.description}
+      </p>
 
       {/* Goal + Context */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-        <div style={{ background: '#0f0f1a', borderRadius: 6, padding: '8px 10px' }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: '#9ece6a', marginBottom: 3 }}>Goal</div>
-          <div style={{ fontSize: 12, color: '#c0c0d0', lineHeight: 1.5 }}>{scenario.goal}</div>
+        <div style={{ background: 'var(--bg-primary)', borderRadius: 6, padding: '8px 10px' }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--accent-green)', marginBottom: 3 }}>
+            {t('scenarios_goal')}
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+            {t(`scenario_${scenario.id.replace(/-/g, '_')}_goal` as Parameters<typeof t>[0]) || scenario.goal}
+          </div>
         </div>
-        <div style={{ background: '#0f0f1a', borderRadius: 6, padding: '8px 10px' }}>
-          <div style={{ fontSize: 11, fontWeight: 600, color: '#e0af68', marginBottom: 3 }}>Australian Context</div>
-          <div style={{ fontSize: 12, color: '#c0c0d0', lineHeight: 1.5 }}>{scenario.context}</div>
+        <div style={{ background: 'var(--bg-primary)', borderRadius: 6, padding: '8px 10px' }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--accent-yellow)', marginBottom: 3 }}>
+            {t('scenarios_context')}
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+            {t(`scenario_${scenario.id.replace(/-/g, '_')}_context` as Parameters<typeof t>[0]) || scenario.context}
+          </div>
         </div>
       </div>
 
@@ -157,12 +140,12 @@ function ScenarioCard({
             style={{
               fontSize: 11,
               padding: '2px 8px',
-              background: '#2a2a3e',
+              background: 'var(--border)',
               borderRadius: 10,
-              color: '#a0a0c0',
+              color: 'var(--text-secondary)',
             }}
           >
-            {c.name}
+            {t(`type_${(c.type || '').replace(/-/g, '_')}` as Parameters<typeof t>[0]) || c.name}
           </span>
         ))}
       </div>
@@ -172,10 +155,10 @@ function ScenarioCard({
         onClick={() => setExpanded((v) => !v)}
         style={{
           background: 'none',
-          border: '1px solid #2a2a4e',
+          border: '1px solid var(--border)',
           borderRadius: 6,
           padding: '6px 12px',
-          color: '#7aa2f7',
+          color: 'var(--accent-blue)',
           fontSize: 12,
           cursor: 'pointer',
           textAlign: 'left',
@@ -184,7 +167,7 @@ function ScenarioCard({
           alignItems: 'center',
         }}
       >
-        <span>What does this setup unlock?</span>
+        <span>{t('scenarios_what_unlocks')}</span>
         <span style={{ transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', fontSize: 10 }}>▼</span>
       </button>
       {expanded && <UnlockCallout types={presentTypes} />}
@@ -195,40 +178,41 @@ function ScenarioCard({
         disabled={isActive}
         style={{
           padding: '10px 16px',
-          background: isActive ? '#2a2a3e' : '#7aa2f7',
+          background: isActive ? 'var(--border)' : 'var(--accent-blue)',
           border: 'none',
           borderRadius: 8,
-          color: isActive ? '#6b7280' : '#0f0f1a',
+          color: isActive ? 'var(--text-dim)' : 'var(--bg-primary)',
           fontWeight: 700,
           fontSize: 14,
           cursor: isActive ? 'default' : 'pointer',
           transition: 'background 0.2s',
         }}
         onMouseEnter={(e) => {
-          if (!isActive) (e.currentTarget as HTMLButtonElement).style.background = '#93b4f8';
+          if (!isActive) (e.currentTarget as HTMLButtonElement).style.background = 'color-mix(in srgb, var(--accent-blue) 80%, white)';
         }}
         onMouseLeave={(e) => {
-          if (!isActive) (e.currentTarget as HTMLButtonElement).style.background = '#7aa2f7';
+          if (!isActive) (e.currentTarget as HTMLButtonElement).style.background = 'var(--accent-blue)';
         }}
       >
-        {isActive ? 'Currently Loaded' : 'Load Scenario →'}
+        {isActive ? t('scenarios_currently_loaded') : t('scenarios_load')}
       </button>
     </div>
   );
 }
 
 export default function ScenariosSection() {
+  const { t } = useTranslation();
   const activeScenarioId = useEnergyStore((s) => s.activeScenarioId);
   const loadScenario = useEnergyStore((s) => s.loadScenario);
 
   return (
     <div style={{ padding: '0 4px' }}>
       <div style={{ marginBottom: 20 }}>
-        <h2 style={{ margin: '0 0 6px', fontSize: 20, fontWeight: 700, color: '#c0caf5' }}>
-          Scenarios
+        <h2 style={{ margin: '0 0 6px', fontSize: 20, fontWeight: 700, color: 'var(--text-heading)' }}>
+          {t('scenarios_title')}
         </h2>
-        <p style={{ margin: 0, fontSize: 13, color: '#888', lineHeight: 1.6 }}>
-          Real Australian homeowner setups, pre-configured and ready to explore. Load a scenario to see how the system behaves — then adjust sliders, enable components, or run the simulation to understand the trade-offs.
+        <p style={{ margin: 0, fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>
+          {t('scenarios_description')}
         </p>
       </div>
 
@@ -243,8 +227,8 @@ export default function ScenariosSection() {
         ))}
       </div>
 
-      <div style={{ marginTop: 24, padding: '14px 18px', background: '#1e1e2e', borderRadius: 8, borderLeft: '3px solid #7aa2f7', fontSize: 13, color: '#9ca3af', lineHeight: 1.7 }}>
-        <strong style={{ color: '#7aa2f7' }}>Tip:</strong> After loading a scenario, switch to the <strong>Simulator</strong> tab to see the live system diagram and power flows. Use the <strong>Add Component</strong> panel to add or remove devices, and the <strong>Learn</strong> tab to understand what each component does.
+      <div style={{ marginTop: 24, padding: '14px 18px', background: 'var(--bg-card)', borderRadius: 8, borderLeft: '3px solid var(--accent-blue)', fontSize: 13, color: 'var(--text-label)', lineHeight: 1.7 }}>
+        <strong style={{ color: 'var(--accent-blue)' }}>{t('scenarios_tip_label')}</strong> <span dangerouslySetInnerHTML={{ __html: t('scenarios_tip') }} />
       </div>
     </div>
   );

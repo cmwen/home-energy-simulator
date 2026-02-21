@@ -1,12 +1,13 @@
 import React from 'react';
 import { Sun, Home, ArrowDownToLine, ArrowUpFromLine, Battery, Zap, Car } from 'lucide-react';
 import { useEnergyStore } from '../../store/energyStore';
+import { useTranslation } from '../../i18n';
 
 const barStyle: React.CSSProperties = {
   display: 'flex',
   gap: 10,
   padding: '12px 16px',
-  background: '#1a1a2e',
+  background: 'var(--bg-secondary)',
   borderRadius: 12,
   overflowX: 'auto',
   alignItems: 'stretch',
@@ -18,7 +19,7 @@ const cardStyle: React.CSSProperties = {
   alignItems: 'center',
   gap: 6,
   padding: '10px 14px',
-  background: '#242440',
+  background: 'var(--bg-card)',
   borderRadius: 10,
   minWidth: 110,
   flex: 1,
@@ -26,7 +27,7 @@ const cardStyle: React.CSSProperties = {
 
 const cardLabelStyle: React.CSSProperties = {
   fontSize: 11,
-  color: '#9ca3af',
+  color: 'var(--text-label)',
   textAlign: 'center',
   whiteSpace: 'nowrap',
 };
@@ -34,13 +35,13 @@ const cardLabelStyle: React.CSSProperties = {
 const cardValueStyle: React.CSSProperties = {
   fontSize: 16,
   fontWeight: 700,
-  color: '#e0e0e0',
+  color: 'var(--text-primary)',
 };
 
 const progressBarOuter: React.CSSProperties = {
   width: '100%',
   height: 6,
-  background: '#1e1e2e',
+  background: 'var(--badge-bg)',
   borderRadius: 3,
   overflow: 'hidden',
   marginTop: 2,
@@ -71,6 +72,7 @@ function ProgressBar({ percent, color }: { percent: number; color: string }) {
 }
 
 export function SystemSummary() {
+  const { t } = useTranslation();
   const summary = useEnergyStore((s) => s.summary);
   const components = useEnergyStore((s) => s.components);
 
@@ -79,14 +81,14 @@ export function SystemSummary() {
   const batteryCharging = summary.batteryPowerW > 0;
   const batteryDischarging = summary.batteryPowerW < 0;
 
-  let batteryStatusText = 'Idle';
-  let batteryColor = '#6b7280';
+  let batteryStatusText = t('summary_battery_idle');
+  let batteryColor = 'var(--text-dim)';
   if (batteryCharging) {
-    batteryStatusText = `Charging ${formatKW(summary.batteryPowerW)}`;
-    batteryColor = '#22c55e';
+    batteryStatusText = `${t('summary_battery_charging')} ${formatKW(summary.batteryPowerW)}`;
+    batteryColor = 'var(--accent-green)';
   } else if (batteryDischarging) {
-    batteryStatusText = `Discharging ${formatKW(Math.abs(summary.batteryPowerW))}`;
-    batteryColor = '#f59e0b';
+    batteryStatusText = `${t('summary_battery_discharging')} ${formatKW(Math.abs(summary.batteryPowerW))}`;
+    batteryColor = 'var(--accent-yellow)';
   }
 
   const evComponent = components.find((c) => c.type === 'evCharger' && c.enabled);
@@ -96,37 +98,37 @@ export function SystemSummary() {
   const evKmAdded = evSessionKwh * evEfficiency;
   const evPowerW = evComponent ? Math.abs(evComponent.currentPowerW) : 0;
   const evIsCharging = evPowerW > 0;
-  const evColor = evIsCharging ? '#7aa2f7' : '#6b7280';
+  const evColor = evIsCharging ? 'var(--accent-blue)' : 'var(--text-dim)';
 
   return (
     <div style={barStyle}>
       <div style={cardStyle}>
-        <Sun size={20} color="#facc15" />
-        <span style={cardLabelStyle}>Solar Generation</span>
+        <Sun size={20} color="var(--accent-yellow)" />
+        <span style={cardLabelStyle}>{t('summary_solar_generation')}</span>
         <span style={cardValueStyle}>{formatKW(summary.totalSolarGenerationW)}</span>
       </div>
 
       <div style={cardStyle}>
-        <Home size={20} color="#f97316" />
-        <span style={cardLabelStyle}>Home Consumption</span>
+        <Home size={20} color="var(--accent-red)" />
+        <span style={cardLabelStyle}>{t('summary_home_consumption')}</span>
         <span style={cardValueStyle}>{formatKW(summary.totalConsumptionW)}</span>
       </div>
 
       <div style={cardStyle}>
-        <ArrowDownToLine size={20} color="#3b82f6" />
-        <span style={cardLabelStyle}>Grid Import</span>
+        <ArrowDownToLine size={20} color="var(--accent-blue)" />
+        <span style={cardLabelStyle}>{t('summary_grid_import')}</span>
         <span style={cardValueStyle}>{formatKW(summary.gridImportW)}</span>
       </div>
 
       <div style={cardStyle}>
-        <ArrowUpFromLine size={20} color="#22c55e" />
-        <span style={cardLabelStyle}>Grid Export</span>
+        <ArrowUpFromLine size={20} color="var(--accent-green)" />
+        <span style={cardLabelStyle}>{t('summary_grid_export')}</span>
         <span style={cardValueStyle}>{formatKW(summary.gridExportW)}</span>
       </div>
 
       <div style={cardStyle}>
         <Battery size={20} color={batteryColor} />
-        <span style={cardLabelStyle}>Battery {Math.round(batterySoc)}%</span>
+        <span style={cardLabelStyle}>{t('summary_battery')} {Math.round(batterySoc)}%</span>
         <span style={{ ...cardValueStyle, fontSize: 13, color: batteryColor }}>{batteryStatusText}</span>
         <ProgressBar percent={batterySoc} color={batteryColor} />
       </div>
@@ -134,13 +136,13 @@ export function SystemSummary() {
       {evComponent && (
         <div style={cardStyle}>
           <Car size={20} color={evColor} />
-          <span style={cardLabelStyle}>EV {Math.round(evSoc)}%</span>
+          <span style={cardLabelStyle}>{t('summary_ev')} {Math.round(evSoc)}%</span>
           <span style={{ ...cardValueStyle, fontSize: 13, color: evColor }}>
-            {evIsCharging ? formatKW(evPowerW) : (evSoc >= 100 ? 'Full' : 'Not charging')}
+            {evIsCharging ? formatKW(evPowerW) : (evSoc >= 100 ? t('summary_ev_full') : t('summary_ev_not_charging'))}
           </span>
           <ProgressBar percent={evSoc} color={evColor} />
           {evSessionKwh > 0 && (
-            <span style={{ fontSize: 11, color: '#9ca3af', marginTop: 2 }}>
+            <span style={{ fontSize: 11, color: 'var(--text-label)', marginTop: 2 }}>
               +{evKmAdded.toFixed(0)} km ({evSessionKwh.toFixed(1)} kWh)
             </span>
           )}
@@ -148,17 +150,17 @@ export function SystemSummary() {
       )}
 
       <div style={cardStyle}>
-        <Zap size={20} color="#a78bfa" />
-        <span style={cardLabelStyle}>Self-Consumption</span>
+        <Zap size={20} color="var(--accent-purple)" />
+        <span style={cardLabelStyle}>{t('summary_self_consumption')}</span>
         <span style={cardValueStyle}>{Math.round(summary.selfConsumptionPercent)}%</span>
-        <ProgressBar percent={summary.selfConsumptionPercent} color="#a78bfa" />
+        <ProgressBar percent={summary.selfConsumptionPercent} color="var(--accent-purple)" />
       </div>
 
       <div style={cardStyle}>
-        <Zap size={20} color="#2dd4bf" />
-        <span style={cardLabelStyle}>Self-Sufficiency</span>
+        <Zap size={20} color="var(--accent-cyan)" />
+        <span style={cardLabelStyle}>{t('summary_self_sufficiency')}</span>
         <span style={cardValueStyle}>{Math.round(summary.autarkyPercent)}%</span>
-        <ProgressBar percent={summary.autarkyPercent} color="#2dd4bf" />
+        <ProgressBar percent={summary.autarkyPercent} color="var(--accent-cyan)" />
       </div>
     </div>
   );

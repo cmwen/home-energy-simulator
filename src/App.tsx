@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
 import { useEnergyStore } from './store/energyStore';
+import { useTranslation, LANGUAGES, type LangCode } from './i18n';
+import { useTheme } from './theme';
 import SystemDiagram from './components/diagram/SystemDiagram';
 import SimulationControls from './components/diagram/SimulationControls';
 import SystemSummary from './components/panels/SystemSummary';
@@ -15,6 +17,8 @@ import { decodeSetupFromUrl, loadFromLocalStorage, clearUrlParam } from './utils
 
 function App() {
   const { activeTab, setActiveTab, userLevel, setUserLevel, selectedComponentId, recalculate, importSetup } = useEnergyStore();
+  const { lang, setLang, t } = useTranslation();
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     // Priority 1: URL share param — load and clean the URL
@@ -35,24 +39,24 @@ function App() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#0f0f1a', color: '#e0e0e0', fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif" }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif" }}>
       {/* Top Navigation */}
-      <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 24px', backgroundColor: '#1a1a2e', borderBottom: '1px solid #2a2a4a' }}>
+      <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 24px', backgroundColor: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <span style={{ fontSize: '24px' }}>⚡</span>
-          <h1 style={{ fontSize: '20px', fontWeight: 700, margin: 0, background: 'linear-gradient(135deg, #7aa2f7, #bb9af7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-            Home Energy Simulator
+          <h1 style={{ fontSize: '20px', fontWeight: 700, margin: 0, background: 'linear-gradient(135deg, var(--accent-blue), var(--accent-purple))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            {t('nav_title')}
           </h1>
         </div>
 
         {/* Tab Navigation */}
-        <div style={{ display: 'flex', gap: '4px', backgroundColor: '#16162a', borderRadius: '8px', padding: '4px' }}>
+        <div style={{ display: 'flex', gap: '4px', backgroundColor: 'var(--bg-tab)', borderRadius: '8px', padding: '4px' }}>
           {([
-            { key: 'simulator' as const, label: 'Simulator' },
-            { key: 'scenarios' as const, label: 'Scenarios' },
-            { key: 'learn' as const, label: 'Learn' },
-            { key: 'protocols' as const, label: 'Protocols' },
-            { key: 'strategies' as const, label: 'Strategies' },
+            { key: 'simulator' as const, label: t('nav_simulator') },
+            { key: 'scenarios' as const, label: t('nav_scenarios') },
+            { key: 'learn' as const, label: t('nav_learn') },
+            { key: 'protocols' as const, label: t('nav_protocols') },
+            { key: 'strategies' as const, label: t('nav_strategies') },
           ]).map((tab) => (
             <button
               key={tab.key}
@@ -61,8 +65,8 @@ function App() {
                 padding: '8px 16px',
                 border: 'none',
                 borderRadius: '6px',
-                backgroundColor: activeTab === tab.key ? '#7aa2f7' : 'transparent',
-                color: activeTab === tab.key ? '#0f0f1a' : '#8888aa',
+                backgroundColor: activeTab === tab.key ? 'var(--accent-blue)' : 'transparent',
+                color: activeTab === tab.key ? 'var(--nav-active-text)' : 'var(--text-muted)',
                 fontWeight: activeTab === tab.key ? 600 : 400,
                 cursor: 'pointer',
                 fontSize: '14px',
@@ -74,30 +78,73 @@ function App() {
           ))}
         </div>
 
-        {/* User Level Toggle */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '13px', color: '#8888aa' }}>Level:</span>
-          <div style={{ display: 'flex', gap: '2px', backgroundColor: '#16162a', borderRadius: '6px', padding: '2px' }}>
-            {(['beginner', 'advanced'] as const).map((level) => (
-              <button
-                key={level}
-                onClick={() => setUserLevel(level)}
-                style={{
-                  padding: '6px 12px',
-                  border: 'none',
-                  borderRadius: '4px',
-                  backgroundColor: userLevel === level ? (level === 'beginner' ? '#9ece6a' : '#bb9af7') : 'transparent',
-                  color: userLevel === level ? '#0f0f1a' : '#8888aa',
-                  fontWeight: userLevel === level ? 600 : 400,
-                  cursor: 'pointer',
-                  fontSize: '12px',
-                  textTransform: 'capitalize',
-                }}
-              >
-                {level}
-              </button>
-            ))}
+        {/* Controls Container */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          {/* User Level Toggle */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{t('nav_level')}</span>
+            <div style={{ display: 'flex', gap: '2px', backgroundColor: 'var(--bg-tab)', borderRadius: '6px', padding: '2px' }}>
+              {(['beginner', 'advanced'] as const).map((level) => (
+                <button
+                  key={level}
+                  onClick={() => setUserLevel(level)}
+                  style={{
+                    padding: '6px 12px',
+                    border: 'none',
+                    borderRadius: '4px',
+                    backgroundColor: userLevel === level ? (level === 'beginner' ? 'var(--accent-green)' : 'var(--accent-purple)') : 'transparent',
+                    color: userLevel === level ? 'var(--nav-active-text)' : 'var(--text-muted)',
+                    fontWeight: userLevel === level ? 600 : 400,
+                    cursor: 'pointer',
+                    fontSize: '12px',
+                    textTransform: 'capitalize',
+                  }}
+                >
+                  {t(`nav_level_${level}`)}
+                </button>
+              ))}
+            </div>
           </div>
+
+          {/* Theme Toggle */}
+          <select
+            value={theme}
+            onChange={(e) => setTheme(e.target.value as any)}
+            style={{
+              padding: '6px 8px',
+              borderRadius: '6px',
+              backgroundColor: 'var(--bg-tab)',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border)',
+              fontSize: '12px',
+              cursor: 'pointer',
+            }}
+          >
+            <option value="auto">{t('theme_auto')}</option>
+            <option value="light">{t('theme_light')}</option>
+            <option value="dark">{t('theme_dark')}</option>
+          </select>
+
+          {/* Language Dropdown */}
+          <select
+            value={lang}
+            onChange={(e) => setLang(e.target.value as LangCode)}
+            style={{
+              padding: '6px 8px',
+              borderRadius: '6px',
+              backgroundColor: 'var(--bg-tab)',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border)',
+              fontSize: '12px',
+              cursor: 'pointer',
+            }}
+          >
+            {LANGUAGES.map((l) => (
+              <option key={l.code} value={l.code}>
+                {l.label}
+              </option>
+            ))}
+          </select>
         </div>
       </nav>
 
@@ -129,8 +176,8 @@ function App() {
       </main>
 
       {/* Footer */}
-      <footer style={{ textAlign: 'center', padding: '24px', color: '#555', fontSize: '13px', borderTop: '1px solid #1a1a2e' }}>
-        Home Energy Simulator — Interactive learning tool for residential energy systems
+      <footer style={{ textAlign: 'center', padding: '24px', color: 'var(--text-footer)', fontSize: '13px', borderTop: '1px solid var(--border)' }}>
+        {t('footer_text')}
       </footer>
     </div>
   );

@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Trash2, Power } from 'lucide-react';
 import { useEnergyStore } from '../../store/energyStore';
+import { useTranslation } from '../../i18n';
 import type { ComponentType, ChargingStandard, ChargingMode } from '../../types/energy';
 
 const typeIcons: Record<ComponentType, string> = {
@@ -17,19 +18,6 @@ const typeIcons: Record<ComponentType, string> = {
   heatPump: '♨️',
 };
 
-const typeLabels: Record<ComponentType, string> = {
-  grid: 'Power Grid',
-  smartMeter: 'Smart Meter',
-  gridMeter: 'Grid Meter (NMI)',
-  energyMonitor: 'Energy Monitor (CT)',
-  mainSwitchboard: 'Main Switchboard',
-  solarPanel: 'Solar Panels',
-  inverter: 'Inverter',
-  battery: 'Battery',
-  evCharger: 'EV Charger',
-  homeLoad: 'Home Load',
-  heatPump: 'Heat Pump',
-};
 
 const panelStyle: React.CSSProperties = {
   position: 'absolute',
@@ -37,12 +25,12 @@ const panelStyle: React.CSSProperties = {
   top: 0,
   bottom: 0,
   width: 340,
-  background: '#1e1e2e',
-  color: '#e0e0e0',
+  background: 'var(--bg-secondary)',
+  color: 'var(--text-primary)',
   padding: 20,
   overflowY: 'auto',
   zIndex: 100,
-  boxShadow: '-4px 0 20px rgba(0,0,0,0.4)',
+  boxShadow: '-4px 0 20px var(--shadow-panel)',
   display: 'flex',
   flexDirection: 'column',
   gap: 16,
@@ -56,7 +44,7 @@ const headerStyle: React.CSSProperties = {
 
 const labelStyle: React.CSSProperties = {
   fontSize: 12,
-  color: '#9ca3af',
+  color: 'var(--text-label)',
   marginBottom: 4,
   display: 'block',
 };
@@ -75,17 +63,17 @@ const sliderLabelRow: React.CSSProperties = {
 
 const sliderStyle: React.CSSProperties = {
   width: '100%',
-  accentColor: '#7c3aed',
+  accentColor: 'var(--accent-purple)',
   cursor: 'pointer',
 };
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
   padding: '6px 10px',
-  background: '#2a2a3e',
-  border: '1px solid #3a3a5e',
+  background: 'var(--bg-input)',
+  border: '1px solid var(--bg-input-border)',
   borderRadius: 6,
-  color: '#e0e0e0',
+  color: 'var(--text-primary)',
   fontSize: 14,
   boxSizing: 'border-box',
 };
@@ -102,7 +90,7 @@ const toggleContainerStyle: React.CSSProperties = {
 };
 
 const sectionStyle: React.CSSProperties = {
-  borderTop: '1px solid #2a2a3e',
+  borderTop: '1px solid var(--border)',
   paddingTop: 12,
   display: 'flex',
   flexDirection: 'column',
@@ -117,9 +105,9 @@ const removeButtonStyle: React.CSSProperties = {
   width: '100%',
   padding: '10px 16px',
   background: 'transparent',
-  border: '1px solid #ef4444',
+  border: '1px solid var(--accent-red)',
   borderRadius: 8,
-  color: '#ef4444',
+  color: 'var(--accent-red)',
   fontSize: 14,
   cursor: 'pointer',
   marginTop: 'auto',
@@ -128,7 +116,7 @@ const removeButtonStyle: React.CSSProperties = {
 const iconButtonStyle: React.CSSProperties = {
   background: 'transparent',
   border: 'none',
-  color: '#9ca3af',
+  color: 'var(--text-label)',
   cursor: 'pointer',
   padding: 4,
   display: 'flex',
@@ -138,7 +126,7 @@ const iconButtonStyle: React.CSSProperties = {
 function ToggleButton({ value, onChange, label }: { value: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
     <div style={toggleContainerStyle}>
-      <span style={{ fontSize: 13, color: '#c0c0d0' }}>{label}</span>
+      <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{label}</span>
       <button
         onClick={() => onChange(!value)}
         style={{
@@ -146,7 +134,7 @@ function ToggleButton({ value, onChange, label }: { value: boolean; onChange: (v
           height: 24,
           borderRadius: 12,
           border: 'none',
-          background: value ? '#7c3aed' : '#3a3a5e',
+          background: value ? 'var(--accent-purple)' : 'var(--bg-input-border)',
           cursor: 'pointer',
           position: 'relative',
           transition: 'background 0.2s',
@@ -157,7 +145,7 @@ function ToggleButton({ value, onChange, label }: { value: boolean; onChange: (v
             width: 18,
             height: 18,
             borderRadius: '50%',
-            background: '#fff',
+            background: 'var(--bg-primary)',
             position: 'absolute',
             top: 3,
             left: value ? 22 : 4,
@@ -190,7 +178,7 @@ function Slider({
     <div style={sliderContainerStyle}>
       <div style={sliderLabelRow}>
         <span style={labelStyle}>{label}</span>
-        <span style={{ fontSize: 13, color: '#a78bfa', fontWeight: 600 }}>
+        <span style={{ fontSize: 13, color: 'var(--accent-purple)', fontWeight: 600 }}>
           {value}
           {unit}
         </span>
@@ -244,6 +232,21 @@ function NumberInput({
 }
 
 export function ComponentEditor() {
+  const { t } = useTranslation();
+
+  const typeLabels: Record<ComponentType, string> = {
+    grid: t('type_grid'),
+    smartMeter: t('type_smart_meter'),
+    gridMeter: t('type_grid_meter'),
+    energyMonitor: t('type_energy_monitor'),
+    mainSwitchboard: t('type_main_switchboard'),
+    solarPanel: t('type_solar_panels'),
+    inverter: t('type_inverter'),
+    battery: t('type_battery'),
+    evCharger: t('type_ev_charger'),
+    homeLoad: t('type_home_load'),
+    heatPump: t('type_heat_pump'),
+  };
   const components = useEnergyStore((s) => s.components);
   const selectedComponentId = useEnergyStore((s) => s.selectedComponentId);
   const selectComponent = useEnergyStore((s) => s.selectComponent);
@@ -264,7 +267,7 @@ export function ComponentEditor() {
         return (
           <>
             <NumberInput
-              label="Panel Count"
+              label={t('field_panel_count')}
               value={config.panelCount ?? 20}
               unit="panels"
               min={1}
@@ -273,7 +276,7 @@ export function ComponentEditor() {
               onChange={(v) => updateComponentConfig(component.id, { panelCount: v })}
             />
             <NumberInput
-              label="Panel Wattage"
+              label={t('field_panel_wattage')}
               value={config.panelWattage ?? 500}
               unit="W"
               min={100}
@@ -282,7 +285,7 @@ export function ComponentEditor() {
               onChange={(v) => updateComponentConfig(component.id, { panelWattage: v })}
             />
             <Slider
-              label="Roof Angle"
+              label={t('field_roof_angle')}
               value={config.roofAngle ?? 30}
               min={0}
               max={90}
@@ -297,7 +300,7 @@ export function ComponentEditor() {
         return (
           <>
             <NumberInput
-              label="Capacity"
+              label={t('field_capacity')}
               value={config.capacityKwh ?? 10}
               unit="kWh"
               min={1}
@@ -306,7 +309,7 @@ export function ComponentEditor() {
               onChange={(v) => updateComponentConfig(component.id, { capacityKwh: v })}
             />
             <Slider
-              label="Current SOC"
+              label={t('field_current_soc')}
               value={config.currentSocPercent ?? 50}
               min={0}
               max={100}
@@ -315,7 +318,7 @@ export function ComponentEditor() {
               onChange={(v) => updateComponentConfig(component.id, { currentSocPercent: v })}
             />
             <NumberInput
-              label="Max Charge Rate"
+              label={t('field_max_charge_rate')}
               value={config.maxChargeRateW ?? 5000}
               unit="W"
               min={500}
@@ -324,7 +327,7 @@ export function ComponentEditor() {
               onChange={(v) => updateComponentConfig(component.id, { maxChargeRateW: v })}
             />
             <NumberInput
-              label="Max Discharge Rate"
+              label={t('field_max_discharge_rate')}
               value={config.maxDischargeRateW ?? 5000}
               unit="W"
               min={500}
@@ -339,7 +342,7 @@ export function ComponentEditor() {
         return (
           <>
             <NumberInput
-              label="Max Current"
+              label={t('field_max_current')}
               value={config.maxCurrentA ?? 32}
               unit="A"
               min={6}
@@ -348,12 +351,12 @@ export function ComponentEditor() {
               onChange={(v) => updateComponentConfig(component.id, { maxCurrentA: v })}
             />
             <ToggleButton
-              label={`Phases: ${config.phases === 3 ? '3-Phase' : '1-Phase'}`}
+              label={`${t('field_phases')}: ${config.phases === 3 ? t('field_phase_three') : t('field_phase_single')}`}
               value={config.phases === 3}
               onChange={(v) => updateComponentConfig(component.id, { phases: v ? 3 : 1 })}
             />
             <NumberInput
-              label="Voltage"
+              label={t('field_voltage')}
               value={config.voltage ?? 230}
               unit="V"
               min={110}
@@ -362,7 +365,7 @@ export function ComponentEditor() {
               onChange={(v) => updateComponentConfig(component.id, { voltage: v })}
             />
             <div>
-              <span style={labelStyle}>Charging Standard</span>
+              <span style={labelStyle}>{t('field_charging_standard')}</span>
               <select
                 value={config.chargingStandard ?? 'ocpp201'}
                 onChange={(e) =>
@@ -378,7 +381,7 @@ export function ComponentEditor() {
               </select>
             </div>
             <div>
-              <span style={labelStyle}>Charging Mode</span>
+              <span style={labelStyle}>{t('field_charging_mode')}</span>
               <select
                 value={config.chargingMode ?? 'eco'}
                 onChange={(e) =>
@@ -388,19 +391,19 @@ export function ComponentEditor() {
                 }
                 style={selectStyle}
               >
-                <option value="fast">Fast</option>
-                <option value="eco">Eco</option>
-                <option value="solar_only">Solar Only</option>
-                <option value="scheduled">Scheduled</option>
+                <option value="fast">{t('mode_fast')}</option>
+                <option value="eco">{t('mode_eco')}</option>
+                <option value="solar_only">{t('mode_solar_only')}</option>
+                <option value="scheduled">{t('mode_scheduled')}</option>
               </select>
             </div>
             <ToggleButton
-              label="Is Charging"
+              label={t('field_is_charging')}
               value={config.isCharging ?? false}
               onChange={(v) => updateComponentConfig(component.id, { isCharging: v })}
             />
             <Slider
-              label="EV Battery (start %)"
+              label={t('field_ev_battery')}
               value={Math.round(config.evBatteryPercent ?? 40)}
               min={0}
               max={100}
@@ -409,7 +412,7 @@ export function ComponentEditor() {
               onChange={(v) => updateComponentConfig(component.id, { evBatteryPercent: v })}
             />
             <NumberInput
-              label="EV Capacity"
+              label={t('field_ev_capacity')}
               value={config.evCapacityKwh ?? 60}
               unit="kWh"
               min={10}
@@ -418,7 +421,7 @@ export function ComponentEditor() {
               onChange={(v) => updateComponentConfig(component.id, { evCapacityKwh: v })}
             />
             <NumberInput
-              label="Efficiency"
+              label={t('field_efficiency')}
               value={config.evEfficiencyKmPerKwh ?? 6}
               unit="km/kWh"
               min={3}
@@ -433,7 +436,7 @@ export function ComponentEditor() {
         return (
           <>
             <NumberInput
-              label="Max Output"
+              label={t('field_max_output')}
               value={config.maxOutputW ?? 10000}
               unit="W"
               min={1000}
@@ -442,7 +445,7 @@ export function ComponentEditor() {
               onChange={(v) => updateComponentConfig(component.id, { maxOutputW: v })}
             />
             <Slider
-              label="Efficiency"
+              label={t('field_efficiency')}
               value={Math.round((config.efficiency ?? 0.97) * 100)}
               min={80}
               max={100}
@@ -451,7 +454,7 @@ export function ComponentEditor() {
               onChange={(v) => updateComponentConfig(component.id, { efficiency: v / 100 })}
             />
             <ToggleButton
-              label="Hybrid Mode"
+              label={t('field_hybrid_mode')}
               value={config.hybridMode ?? true}
               onChange={(v) => updateComponentConfig(component.id, { hybridMode: v })}
             />
@@ -462,11 +465,11 @@ export function ComponentEditor() {
       case 'gridMeter':
         return (
           <>
-            <div style={{ padding: '8px 10px', background: '#16213e', borderRadius: 6, fontSize: 12, color: '#7aa2f7', marginBottom: 4 }}>
-              📋 This is the Ausgrid/DNSP NMI meter at the property boundary. It records import/export for billing and sets the export limit rule. You cannot read or control it directly.
+            <div style={{ padding: '8px 10px', background: 'var(--bg-info)', borderRadius: 6, fontSize: 12, color: 'var(--accent-blue)', marginBottom: 4 }}>
+              📋 {t('info_grid_meter')}
             </div>
             <NumberInput
-              label="Grid Export Limit"
+              label={t('field_grid_export_limit')}
               value={config.gridExportLimitW ?? 5000}
               unit="W"
               min={0}
@@ -475,7 +478,7 @@ export function ComponentEditor() {
               onChange={(v) => updateComponentConfig(component.id, { gridExportLimitW: v })}
             />
             <NumberInput
-              label="Feed-in Tariff"
+              label={t('field_feed_in_tariff')}
               value={config.feedInTariff ?? 0.05}
               unit="$/kWh"
               min={0}
@@ -484,7 +487,7 @@ export function ComponentEditor() {
               onChange={(v) => updateComponentConfig(component.id, { feedInTariff: v })}
             />
             <NumberInput
-              label="Import Tariff"
+              label={t('field_import_tariff')}
               value={config.importTariff ?? 0.32}
               unit="$/kWh"
               min={0}
@@ -497,22 +500,22 @@ export function ComponentEditor() {
 
       case 'energyMonitor':
         return (
-          <div style={{ padding: '8px 10px', background: '#16213e', borderRadius: 6, fontSize: 12, color: '#ec4899' }}>
-            📡 Consumer-side CT clamp monitor (e.g. Shelly EM, Emporia Vue) — installed at your main switchboard. Enables real-time solar surplus measurement, required for solar-only EV charging and inverter zero-export throttling.
+          <div style={{ padding: '8px 10px', background: 'var(--bg-info)', borderRadius: 6, fontSize: 12, color: 'var(--accent-purple)' }}>
+            📡 {t('info_energy_monitor')}
           </div>
         );
 
       case 'mainSwitchboard':
         return (
-          <div style={{ padding: '8px 10px', background: '#16213e', borderRadius: 6, fontSize: 12, color: '#ca8a04' }}>
-            🔧 The main AC distribution board inside your home. Every AC load (home circuits, EV charger, heat pump) connects here. The inverter AC output and the grid connection both feed into this board.
+          <div style={{ padding: '8px 10px', background: 'var(--bg-info)', borderRadius: 6, fontSize: 12, color: 'var(--accent-yellow)' }}>
+            🔧 {t('info_switchboard')}
           </div>
         );
 
       case 'homeLoad':
         return (
           <Slider
-            label="Base Load"
+            label={t('field_base_load')}
             value={config.baseLoadW ?? 1500}
             min={100}
             max={15000}
@@ -525,7 +528,7 @@ export function ComponentEditor() {
       case 'heatPump':
         return (
           <Slider
-            label="COP Rating"
+            label={t('field_cop_rating')}
             value={config.copRating ?? 3.5}
             min={1}
             max={6}
@@ -549,7 +552,7 @@ export function ComponentEditor() {
           <span style={{ fontSize: 24 }}>{typeIcons[type]}</span>
           <div>
             <div style={{ fontSize: 16, fontWeight: 700 }}>{component.name}</div>
-            <div style={{ fontSize: 12, color: '#6b7280' }}>{typeLabels[type]}</div>
+            <div style={{ fontSize: 12, color: 'var(--text-dim)' }}>{typeLabels[type]}</div>
           </div>
         </div>
         <button style={iconButtonStyle} onClick={() => selectComponent(null)}>
@@ -559,8 +562,8 @@ export function ComponentEditor() {
 
       <div style={toggleContainerStyle}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Power size={14} color={component.enabled ? '#22c55e' : '#6b7280'} />
-          <span style={{ fontSize: 13 }}>{component.enabled ? 'Enabled' : 'Disabled'}</span>
+          <Power size={14} color={component.enabled ? 'var(--accent-green)' : 'var(--text-dim)'} />
+          <span style={{ fontSize: 13 }}>{component.enabled ? t('editor_enabled') : t('editor_disabled')}</span>
         </div>
         <button
           onClick={() => toggleComponent(component.id)}
@@ -569,7 +572,7 @@ export function ComponentEditor() {
             height: 24,
             borderRadius: 12,
             border: 'none',
-            background: component.enabled ? '#22c55e' : '#3a3a5e',
+            background: component.enabled ? 'var(--accent-green)' : 'var(--bg-input-border)',
             cursor: 'pointer',
             position: 'relative',
             transition: 'background 0.2s',
@@ -580,7 +583,7 @@ export function ComponentEditor() {
               width: 18,
               height: 18,
               borderRadius: '50%',
-              background: '#fff',
+              background: 'var(--bg-primary)',
               position: 'absolute',
               top: 3,
               left: component.enabled ? 22 : 4,
@@ -592,7 +595,7 @@ export function ComponentEditor() {
 
       {showPowerSlider && (
         <Slider
-          label="Power Override"
+          label={t('editor_power_override')}
           value={Math.abs(component.currentPowerW)}
           min={0}
           max={component.maxPowerW}
@@ -610,14 +613,14 @@ export function ComponentEditor() {
           removeComponent(component.id);
         }}
         onMouseEnter={(e) => {
-          (e.currentTarget as HTMLButtonElement).style.background = '#ef44441a';
+          (e.currentTarget as HTMLButtonElement).style.background = 'rgba(239, 68, 68, 0.1)';
         }}
         onMouseLeave={(e) => {
           (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
         }}
       >
         <Trash2 size={16} />
-        Remove Component
+        {t('editor_remove_component')}
       </button>
     </div>
   );
