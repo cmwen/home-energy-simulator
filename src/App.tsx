@@ -8,6 +8,7 @@ import AddComponentPanel from './components/panels/AddComponentPanel';
 import LearnSection from './components/education/LearnSection';
 import ProtocolsSection from './components/education/ProtocolsSection';
 import StrategiesSection from './components/education/StrategiesSection';
+import ScenariosSection from './components/scenarios/ScenariosSection';
 
 function App() {
   const { activeTab, setActiveTab, userLevel, setUserLevel, selectedComponentId, recalculate } = useEnergyStore();
@@ -31,6 +32,7 @@ function App() {
         <div style={{ display: 'flex', gap: '4px', backgroundColor: '#16162a', borderRadius: '8px', padding: '4px' }}>
           {([
             { key: 'simulator' as const, label: 'Simulator' },
+            { key: 'scenarios' as const, label: 'Scenarios' },
             { key: 'learn' as const, label: 'Learn' },
             { key: 'protocols' as const, label: 'Protocols' },
             { key: 'strategies' as const, label: 'Strategies' },
@@ -102,6 +104,7 @@ function App() {
           </div>
         )}
         {activeTab === 'learn' && <LearnSection />}
+        {activeTab === 'scenarios' && <ScenariosSection />}
         {activeTab === 'protocols' && <ProtocolsSection />}
         {activeTab === 'strategies' && <StrategiesSection />}
       </main>

@@ -1,12 +1,16 @@
 export type ComponentType = 
   | 'grid' 
-  | 'smartMeter' 
+  | 'gridMeter'        // Ausgrid/DNSP bi-directional meter at the boundary (NMI meter)
+  | 'energyMonitor'    // Consumer-side CT clamp / energy monitor (e.g. Emporia, Shelly EM)
+  | 'mainSwitchboard'  // Main AC switchboard / power board — the AC distribution hub
   | 'solarPanel' 
   | 'inverter' 
   | 'battery' 
   | 'evCharger' 
   | 'homeLoad' 
-  | 'heatPump';
+  | 'heatPump'
+  // Legacy alias kept so any serialised data referencing 'smartMeter' still works
+  | 'smartMeter';
 
 export type ChargingStandard = 'ocpp16' | 'ocpp201' | 'modbus';
 export type ChargingMode = 'fast' | 'eco' | 'solar_only' | 'scheduled';
@@ -56,11 +60,14 @@ export interface ComponentConfig {
   efficiency?: number; // 0-1
   hybridMode?: boolean; // can manage battery too
   
-  // Smart meter specific
+  // Grid meter (Ausgrid NMI meter) — replaces old smartMeter
   gridExportLimitW?: number;
   feedInTariff?: number; // per kWh
   importTariff?: number; // per kWh
-  
+
+  // Energy monitor (consumer CT clamp)
+  monitoredCircuits?: string[]; // e.g. ['solar', 'grid', 'ev']
+
   // Home load specific
   baseLoadW?: number;
   
@@ -92,4 +99,20 @@ export interface SystemSummary {
   batteryPowerW: number; // positive = charging, negative = discharging
   selfConsumptionPercent: number;
   autarkyPercent: number; // self-sufficiency
+}
+
+// ─── Scenario Preset ───────────────────────────────────────────────────────────
+
+export interface ScenarioPreset {
+  id: string;
+  name: string;
+  icon: string;
+  tagline: string;
+  description: string;
+  /** What the homeowner is trying to achieve */
+  goal: string;
+  /** Typical Australian context */
+  context: string;
+  components: Partial<EnergyComponent>[];
+  simulation: Partial<SimulationState>;
 }

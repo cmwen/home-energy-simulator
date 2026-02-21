@@ -6,6 +6,9 @@ import type { ComponentType, ChargingStandard, ChargingMode } from '../../types/
 const typeIcons: Record<ComponentType, string> = {
   grid: '🔌',
   smartMeter: '📊',
+  gridMeter: '🔌',
+  energyMonitor: '📡',
+  mainSwitchboard: '🔧',
   solarPanel: '☀️',
   inverter: '🔄',
   battery: '🔋',
@@ -17,6 +20,9 @@ const typeIcons: Record<ComponentType, string> = {
 const typeLabels: Record<ComponentType, string> = {
   grid: 'Power Grid',
   smartMeter: 'Smart Meter',
+  gridMeter: 'Grid Meter (NMI)',
+  energyMonitor: 'Energy Monitor (CT)',
+  mainSwitchboard: 'Main Switchboard',
   solarPanel: 'Solar Panels',
   inverter: 'Inverter',
   battery: 'Battery',
@@ -435,11 +441,15 @@ export function ComponentEditor() {
         );
 
       case 'smartMeter':
+      case 'gridMeter':
         return (
           <>
+            <div style={{ padding: '8px 10px', background: '#16213e', borderRadius: 6, fontSize: 12, color: '#7aa2f7', marginBottom: 4 }}>
+              📋 This is the Ausgrid/DNSP NMI meter at the property boundary. It records import/export for billing and sets the export limit rule. You cannot read or control it directly.
+            </div>
             <NumberInput
               label="Grid Export Limit"
-              value={config.gridExportLimitW ?? 10000}
+              value={config.gridExportLimitW ?? 5000}
               unit="W"
               min={0}
               max={50000}
@@ -448,8 +458,8 @@ export function ComponentEditor() {
             />
             <NumberInput
               label="Feed-in Tariff"
-              value={config.feedInTariff ?? 0.08}
-              unit="€/kWh"
+              value={config.feedInTariff ?? 0.05}
+              unit="$/kWh"
               min={0}
               max={1}
               step={0.01}
@@ -457,14 +467,28 @@ export function ComponentEditor() {
             />
             <NumberInput
               label="Import Tariff"
-              value={config.importTariff ?? 0.3}
-              unit="€/kWh"
+              value={config.importTariff ?? 0.32}
+              unit="$/kWh"
               min={0}
               max={1}
               step={0.01}
               onChange={(v) => updateComponentConfig(component.id, { importTariff: v })}
             />
           </>
+        );
+
+      case 'energyMonitor':
+        return (
+          <div style={{ padding: '8px 10px', background: '#16213e', borderRadius: 6, fontSize: 12, color: '#ec4899' }}>
+            📡 Consumer-side CT clamp monitor (e.g. Shelly EM, Emporia Vue) — installed at your main switchboard. Enables real-time solar surplus measurement, required for solar-only EV charging and inverter zero-export throttling.
+          </div>
+        );
+
+      case 'mainSwitchboard':
+        return (
+          <div style={{ padding: '8px 10px', background: '#16213e', borderRadius: 6, fontSize: 12, color: '#ca8a04' }}>
+            🔧 The main AC distribution board inside your home. Every AC load (home circuits, EV charger, heat pump) connects here. The inverter AC output and the grid connection both feed into this board.
+          </div>
         );
 
       case 'homeLoad':

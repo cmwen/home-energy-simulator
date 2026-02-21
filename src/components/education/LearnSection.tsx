@@ -136,34 +136,46 @@ export default function LearnSection() {
       ),
     },
     {
-      title: '📊 What is a Smart Meter?',
+      title: '🔌 Grid Meter vs Energy Monitor — What\'s the Difference?',
       content: (
         <>
           <p style={{ margin: '0 0 10px' }}>
-            A smart meter is a digital electricity meter that measures both the electricity you <strong style={{ color: '#f7768e' }}>import</strong> from the grid and the electricity you <strong style={{ color: '#9ece6a' }}>export</strong> back to it.
+            There are <strong>two very different metering devices</strong> in a solar home. They are often confused because they both measure electricity — but they sit in different places, serve different purposes, and are owned by different parties.
           </p>
-          <p style={{ margin: '0 0 8px' }}>
-            <strong style={{ color: '#bb9af7' }}>Key features:</strong>
-          </p>
-          <ul style={{ margin: '0 0 10px', paddingLeft: 20 }}>
-            <li style={{ marginBottom: 4 }}>
-              Records energy usage in near real-time (typically every 5–15 seconds for instantaneous power, logged every 15 minutes)
-            </li>
-            <li style={{ marginBottom: 4 }}>
-              Communicates with your utility company automatically — no more manual meter readings
-            </li>
-            <li style={{ marginBottom: 4 }}>
-              Enables <strong>time-of-use tariffs</strong> where electricity costs different amounts at different times of day
-            </li>
-            <li style={{ marginBottom: 4 }}>
-              Measures both import and export, allowing accurate billing with solar
-            </li>
-            <li style={{ marginBottom: 4 }}>
-              Many smart meters provide a local data interface (e.g., P1 port, Modbus) that a home energy management system can read
-            </li>
-          </ul>
-          <p style={{ margin: 0, color: '#73daca' }}>
-            A smart meter is essential for optimizing solar self-consumption and for participating in dynamic tariff programs.
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+            <div style={{ backgroundColor: '#1a1a2e', borderRadius: 6, padding: 12, borderLeft: '3px solid #6366f1' }}>
+              <strong style={{ color: '#6366f1' }}>Grid Meter (NMI Meter)</strong>
+              <p style={{ margin: '6px 0 0', fontSize: 13 }}>
+                The <strong>Ausgrid / DNSP bi-directional meter</strong> at the property boundary. Installed and owned by your electricity distributor. Records the total import and export across the whole property for billing. You cannot read or control this meter directly.
+              </p>
+              <ul style={{ margin: '8px 0 0', paddingLeft: 16, fontSize: 12, color: '#9ca3af' }}>
+                <li style={{ marginBottom: 3 }}>Sets the export limit rule (e.g. 5 kW in Ausgrid zones)</li>
+                <li style={{ marginBottom: 3 }}>Provides billing data to your retailer</li>
+                <li style={{ marginBottom: 3 }}>Enables feed-in tariff credit</li>
+                <li>You pay the retailer; they read this meter</li>
+              </ul>
+            </div>
+            <div style={{ backgroundColor: '#1a1a2e', borderRadius: 6, padding: 12, borderLeft: '3px solid #ec4899' }}>
+              <strong style={{ color: '#ec4899' }}>Energy Monitor (CT Clamp)</strong>
+              <p style={{ margin: '6px 0 0', fontSize: 13 }}>
+                A <strong>consumer-side device</strong> you install at your main switchboard. Examples: Shelly EM, Emporia Vue, IoTaWatt. Uses clip-on CT sensors on each circuit. Gives your HEMS or inverter real-time power readings in milliseconds.
+              </p>
+              <ul style={{ margin: '8px 0 0', paddingLeft: 16, fontSize: 12, color: '#9ca3af' }}>
+                <li style={{ marginBottom: 3 }}>Required for solar-only EV charging</li>
+                <li style={{ marginBottom: 3 }}>Required for inverter zero-export throttling</li>
+                <li style={{ marginBottom: 3 }}>Enables smart battery dispatch</li>
+                <li>You own it and read it</li>
+              </ul>
+            </div>
+          </div>
+          <div style={{ backgroundColor: '#16161e', borderRadius: 6, padding: 12, marginBottom: 10, fontFamily: 'monospace', fontSize: 12, color: '#9ece6a', lineHeight: 1.9 }}>
+            Grid → <strong>Grid Meter (NMI)</strong> → Main Switchboard<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↑<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Energy Monitor (CT)</strong> ← clips onto board wires<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓ feeds data to HEMS / inverter
+          </div>
+          <p style={{ margin: 0, color: '#73daca', fontSize: 13 }}>
+            <strong>Key rule:</strong> The NMI meter is your bill. The CT clamp is your brain. For smart solar self-consumption — especially solar-only EV charging — you need the CT clamp. The NMI meter alone is not enough.
           </p>
         </>
       ),

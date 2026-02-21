@@ -8,6 +8,9 @@ const COMPONENT_COLORS: Record<ComponentType, { fill: string; stroke: string; te
   evCharger: { fill: '#ede9fe', stroke: '#8b5cf6', text: '#5b21b6' },
   homeLoad: { fill: '#ffedd5', stroke: '#f97316', text: '#9a3412' },
   smartMeter: { fill: '#f3f4f6', stroke: '#6b7280', text: '#1f2937' },
+  gridMeter: { fill: '#e0e7ff', stroke: '#6366f1', text: '#312e81' },
+  energyMonitor: { fill: '#fce7f3', stroke: '#ec4899', text: '#831843' },
+  mainSwitchboard: { fill: '#fef9c3', stroke: '#ca8a04', text: '#713f12' },
   inverter: { fill: '#ccfbf1', stroke: '#14b8a6', text: '#134e4a' },
   heatPump: { fill: '#fee2e2', stroke: '#ef4444', text: '#991b1b' },
 };
@@ -15,6 +18,9 @@ const COMPONENT_COLORS: Record<ComponentType, { fill: string; stroke: string; te
 const COMPONENT_ICONS: Record<ComponentType, string> = {
   grid: '⚡',
   smartMeter: '📊',
+  gridMeter: '🔌',
+  energyMonitor: '📡',
+  mainSwitchboard: '🔧',
   solarPanel: '☀️',
   inverter: '🔄',
   battery: '🔋',
@@ -39,9 +45,12 @@ function getFlowColor(flow: PowerFlow, components: EnergyComponent[]): string {
       return '#22c55e';
     case 'grid':
     case 'smartMeter':
+    case 'gridMeter':
       return '#3b82f6';
     case 'battery':
       return '#f97316';
+    case 'mainSwitchboard':
+      return '#a78bfa';
     default:
       return '#6b7280';
   }

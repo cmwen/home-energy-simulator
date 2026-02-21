@@ -10,8 +10,10 @@ interface ComponentOption {
 }
 
 const componentOptions: ComponentOption[] = [
-  { type: 'grid', icon: '🔌', label: 'Power Grid', singletonOnly: true },
-  { type: 'smartMeter', icon: '📊', label: 'Smart Meter', singletonOnly: true },
+  { type: 'grid', icon: '⚡', label: 'Power Grid', singletonOnly: true },
+  { type: 'gridMeter', icon: '🔌', label: 'Grid Meter (NMI)', singletonOnly: true },
+  { type: 'mainSwitchboard', icon: '🔧', label: 'Switchboard', singletonOnly: true },
+  { type: 'energyMonitor', icon: '📡', label: 'Energy Monitor', singletonOnly: true },
   { type: 'solarPanel', icon: '☀️', label: 'Solar Panels', singletonOnly: false },
   { type: 'inverter', icon: '🔄', label: 'Inverter', singletonOnly: false },
   { type: 'battery', icon: '🔋', label: 'Battery', singletonOnly: false },
@@ -38,7 +40,7 @@ const titleStyle: React.CSSProperties = {
 
 const gridStyle: React.CSSProperties = {
   display: 'grid',
-  gridTemplateColumns: 'repeat(4, 1fr)',
+  gridTemplateColumns: 'repeat(5, 1fr)',
   gap: 8,
 };
 

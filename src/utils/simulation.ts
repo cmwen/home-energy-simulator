@@ -51,14 +51,33 @@ function calculateSolarOutput(component: EnergyComponent, irradiance: number): n
   const angleDiff = Math.abs(roofAngle! - optimalAngle);
   const angleEfficiency = 1 - (angleDiff / 90) * 0.3;
   
-  // Temperature derating (above 25C, panels lose ~0.4% per degree)
-  // We'll skip temperature for simplicity here, applied at inverter level
-  
   const maxOutput = panelCount! * panelWattage!;
   return Math.round(maxOutput * irradiance * angleEfficiency);
 }
 
 // Main power flow calculation
+//
+// Correct residential topology:
+//
+//   Solar Panels (DC)
+//       │
+//   Hybrid Inverter  ──────────────────┐
+//       │ (AC output)                  │ (DC side, if hybrid)
+//       │                              │
+//   Main Switchboard  ◄────────────────┤ Battery (AC-coupled or DC-coupled via inverter)
+//       │
+//   ┌───┼──────────────┬──────────────┐
+//   │   │              │              │
+// Home  EV Charger  Heat Pump   Grid Meter ── Grid
+// Load  (on its own    (on its     (NMI boundary)
+//        circuit at     own circuit)
+//        switchboard)
+//
+// The EV charger and all AC loads are fed from the switchboard, not from the inverter directly.
+// The inverter AC output feeds INTO the switchboard, same as the grid connection.
+// The grid meter sits between the switchboard and the street (measures import/export at NMI).
+// Consumer energy monitors (CT clamps) sit at the switchboard to measure individual circuits.
+
 export function calculatePowerFlows(
   components: EnergyComponent[],
   simulation: SimulationState
@@ -67,7 +86,17 @@ export function calculatePowerFlows(
   const updated = components.map((c) => ({ ...c }));
   
   const find = (type: string) => updated.filter((c) => c.type === type && c.enabled);
+  // gridMeter was previously called smartMeter — support both
+  const findMeter = () => [
+    ...updated.filter((c) => c.type === 'gridMeter' && c.enabled),
+    ...updated.filter((c) => c.type === 'smartMeter' && c.enabled),
+  ];
   
+  const switchboards = find('mainSwitchboard');
+  // If no explicit switchboard exists, use a virtual hub (no visual node) —
+  // we just use the inverter or homeLoad as the hub ID for flow lines.
+  const hubId = switchboards.length > 0 ? switchboards[0].id : null;
+
   // Step 1: Calculate solar generation
   const irradiance = calculateSolarIrradiance(simulation);
   const solars = find('solarPanel');
@@ -80,6 +109,7 @@ export function calculatePowerFlows(
   }
   
   // Step 2: Apply inverter efficiency
+  // Inverter converts DC solar → AC and feeds it into the switchboard
   const inverters = find('inverter');
   let availableSolarW = totalSolarW;
   
@@ -90,6 +120,7 @@ export function calculatePowerFlows(
     inv.currentPowerW = Math.round(invertedPower * eff);
     availableSolarW = inv.currentPowerW;
     
+    // Solar panels → Inverter (DC side)
     if (totalSolarW > 0) {
       for (const solar of solars) {
         flows.push({
@@ -100,11 +131,21 @@ export function calculatePowerFlows(
         });
       }
     }
+
+    // Inverter AC output → Switchboard (or virtual hub)
+    if (inv.currentPowerW > 0 && hubId) {
+      flows.push({
+        fromId: inv.id,
+        toId: hubId,
+        powerW: inv.currentPowerW,
+        label: `${(inv.currentPowerW / 1000).toFixed(1)} kW`,
+      });
+    }
   }
   
   let surplusW = availableSolarW;
   
-  // Step 3: Supply home loads first
+  // Step 3: Supply home loads first — these are fed from the switchboard
   const homeLoads = find('homeLoad');
   let totalDemandW = 0;
   for (const load of homeLoads) {
@@ -113,7 +154,7 @@ export function calculatePowerFlows(
     totalDemandW += demand;
   }
   
-  // Heat pumps as loads
+  // Heat pumps — also fed from switchboard via their own circuit
   const heatPumps = find('heatPump');
   for (const hp of heatPumps) {
     const hpDemand = Math.abs(hp.currentPowerW) || 2000;
@@ -121,20 +162,25 @@ export function calculatePowerFlows(
     totalDemandW += hpDemand;
   }
   
-  // Solar -> home loads flow
+  // Switchboard (or inverter) → Home loads
   const solarToHome = Math.min(surplusW, totalDemandW);
-  if (solarToHome > 0 && inverters.length > 0 && homeLoads.length > 0) {
-    flows.push({
-      fromId: inverters[0].id,
-      toId: homeLoads[0].id,
-      powerW: solarToHome,
-      label: `${(solarToHome / 1000).toFixed(1)} kW`,
-    });
+  if (solarToHome > 0 && homeLoads.length > 0) {
+    const sourceId = hubId ?? (inverters.length > 0 ? inverters[0].id : null);
+    if (sourceId) {
+      flows.push({
+        fromId: sourceId,
+        toId: homeLoads[0].id,
+        powerW: solarToHome,
+        label: `${(solarToHome / 1000).toFixed(1)} kW`,
+      });
+    }
   }
   surplusW -= solarToHome;
   let unmetDemandW = totalDemandW - solarToHome;
   
-  // Step 4: Handle EV charger based on mode
+  // Step 4: EV Charger — connected to its own circuit on the switchboard
+  // It is NOT wired through the inverter; it draws from the switchboard
+  // which is fed by both the inverter (solar/battery) and the grid.
   const evChargers = find('evCharger');
   for (const ev of evChargers) {
     if (!ev.config.isCharging) {
@@ -147,24 +193,28 @@ export function calculatePowerFlows(
     
     switch (ev.config.chargingMode) {
       case 'solar_only':
+        // Only charge from surplus solar reaching the switchboard
         evDemandW = Math.min(surplusW, maxCharge);
         surplusW -= evDemandW;
         break;
-      case 'eco':
-        // Use surplus first, then up to 50% from grid
-        evDemandW = Math.min(surplusW + maxCharge * 0.5, maxCharge);
-        const fromSolar = Math.min(surplusW, evDemandW);
-        surplusW -= fromSolar;
-        unmetDemandW += evDemandW - fromSolar;
+      case 'eco': {
+        // Use surplus first, then up to 50% from grid via switchboard
+        const ecoFromSolar = Math.min(surplusW, maxCharge);
+        const ecoFromGrid = Math.min(maxCharge * 0.5, maxCharge - ecoFromSolar);
+        evDemandW = ecoFromSolar + ecoFromGrid;
+        surplusW -= ecoFromSolar;
+        unmetDemandW += ecoFromGrid;
         break;
-      case 'fast':
+      }
+      case 'fast': {
         evDemandW = maxCharge;
         const evFromSolar = Math.min(surplusW, evDemandW);
         surplusW -= evFromSolar;
         unmetDemandW += evDemandW - evFromSolar;
         break;
+      }
       case 'scheduled':
-        // Only charge during off-peak (23:00-06:00)
+        // Only charge during off-peak (23:00-06:00), purely from grid
         if (simulation.timeOfDay >= 23 || simulation.timeOfDay < 6) {
           evDemandW = maxCharge;
           unmetDemandW += evDemandW;
@@ -174,17 +224,23 @@ export function calculatePowerFlows(
     
     ev.currentPowerW = -evDemandW;
     
-    if (evDemandW > 0 && inverters.length > 0) {
-      flows.push({
-        fromId: inverters[0].id,
-        toId: ev.id,
-        powerW: evDemandW,
-        label: `${(evDemandW / 1000).toFixed(1)} kW`,
-      });
+    // Flow: Switchboard → EV Charger circuit
+    if (evDemandW > 0) {
+      const sourceId = hubId ?? (inverters.length > 0 ? inverters[0].id : null);
+      if (sourceId) {
+        flows.push({
+          fromId: sourceId,
+          toId: ev.id,
+          powerW: evDemandW,
+          label: `${(evDemandW / 1000).toFixed(1)} kW`,
+        });
+      }
     }
   }
   
   // Step 5: Battery management
+  // Battery is DC-coupled via hybrid inverter (most common AU setup) or
+  // AC-coupled with its own AC-battery inverter — both appear on the switchboard
   const batteries = find('battery');
   for (const bat of batteries) {
     const soc = bat.config.currentSocPercent ?? 50;
@@ -192,29 +248,31 @@ export function calculatePowerFlows(
     const maxDischarge = bat.config.maxDischargeRateW ?? 5000;
     
     if (surplusW > 0 && soc < 100) {
-      // Charge battery with surplus solar
+      // Charge battery with surplus solar (via inverter/switchboard)
       const chargeW = Math.min(surplusW, maxCharge);
       bat.currentPowerW = chargeW;
       surplusW -= chargeW;
       
-      if (inverters.length > 0) {
+      const sourceId = hubId ?? (inverters.length > 0 ? inverters[0].id : null);
+      if (sourceId) {
         flows.push({
-          fromId: inverters[0].id,
+          fromId: sourceId,
           toId: bat.id,
           powerW: chargeW,
           label: `${(chargeW / 1000).toFixed(1)} kW`,
         });
       }
     } else if (unmetDemandW > 0 && soc > 10) {
-      // Discharge battery to cover demand
+      // Discharge battery back into the switchboard to cover demand
       const dischargeW = Math.min(unmetDemandW, maxDischarge);
       bat.currentPowerW = -dischargeW;
       unmetDemandW -= dischargeW;
       
-      if (homeLoads.length > 0) {
+      const destId = hubId ?? (homeLoads.length > 0 ? homeLoads[0].id : null);
+      if (destId) {
         flows.push({
           fromId: bat.id,
-          toId: homeLoads[0].id,
+          toId: destId,
           powerW: dischargeW,
           label: `${(dischargeW / 1000).toFixed(1)} kW`,
         });
@@ -224,57 +282,81 @@ export function calculatePowerFlows(
     }
   }
   
-  // Step 6: Grid interaction
-  const meters = find('smartMeter');
+  // Step 6: Grid interaction — measured at the grid meter (NMI boundary)
+  // Grid ↔ Grid Meter ↔ Main Switchboard
+  const meters = findMeter();
   const grids = find('grid');
   
-  if (grids.length > 0 && meters.length > 0) {
-    const meter = meters[0];
+  if (grids.length > 0) {
     const grid = grids[0];
-    const exportLimit = meter.config.gridExportLimitW ?? 10000;
+    const exportLimit = meters.length > 0 ? (meters[0].config.gridExportLimitW ?? 10000) : 10000;
     
     if (surplusW > 0) {
-      // Export surplus to grid (within limit)
+      // Export surplus to grid (within limit set by grid meter / DNSP rules)
       const exportW = Math.min(surplusW, exportLimit);
-      grid.currentPowerW = -exportW; // negative = exporting
-      meter.currentPowerW = -exportW;
+      grid.currentPowerW = -exportW;
+      if (meters.length > 0) meters[0].currentPowerW = -exportW;
       
-      if (inverters.length > 0) {
-        flows.push({
-          fromId: inverters[0].id,
-          toId: meter.id,
-          powerW: exportW,
-          label: `${(exportW / 1000).toFixed(1)} kW export`,
-        });
+      // Switchboard → Grid Meter → Grid
+      const sourceId = hubId ?? (inverters.length > 0 ? inverters[0].id : null);
+      if (sourceId) {
+        if (meters.length > 0) {
+          flows.push({
+            fromId: sourceId,
+            toId: meters[0].id,
+            powerW: exportW,
+            label: `${(exportW / 1000).toFixed(1)} kW export`,
+          });
+          flows.push({
+            fromId: meters[0].id,
+            toId: grid.id,
+            powerW: exportW,
+            label: `${(exportW / 1000).toFixed(1)} kW`,
+          });
+        } else {
+          flows.push({
+            fromId: sourceId,
+            toId: grid.id,
+            powerW: exportW,
+            label: `${(exportW / 1000).toFixed(1)} kW export`,
+          });
+        }
       }
-      flows.push({
-        fromId: meter.id,
-        toId: grid.id,
-        powerW: exportW,
-        label: `${(exportW / 1000).toFixed(1)} kW export`,
-      });
     } else if (unmetDemandW > 0) {
-      // Import from grid
+      // Import from grid → Grid Meter → Switchboard
       grid.currentPowerW = unmetDemandW;
-      meter.currentPowerW = unmetDemandW;
+      if (meters.length > 0) meters[0].currentPowerW = unmetDemandW;
       
-      flows.push({
-        fromId: grid.id,
-        toId: meter.id,
-        powerW: unmetDemandW,
-        label: `${(unmetDemandW / 1000).toFixed(1)} kW import`,
-      });
-      if (homeLoads.length > 0) {
+      if (meters.length > 0) {
         flows.push({
-          fromId: meter.id,
-          toId: homeLoads[0].id,
+          fromId: grid.id,
+          toId: meters[0].id,
           powerW: unmetDemandW,
-          label: `${(unmetDemandW / 1000).toFixed(1)} kW`,
+          label: `${(unmetDemandW / 1000).toFixed(1)} kW import`,
         });
+        const destId = hubId ?? (homeLoads.length > 0 ? homeLoads[0].id : null);
+        if (destId) {
+          flows.push({
+            fromId: meters[0].id,
+            toId: destId,
+            powerW: unmetDemandW,
+            label: `${(unmetDemandW / 1000).toFixed(1)} kW`,
+          });
+        }
+      } else {
+        const destId = hubId ?? (homeLoads.length > 0 ? homeLoads[0].id : null);
+        if (destId) {
+          flows.push({
+            fromId: grid.id,
+            toId: destId,
+            powerW: unmetDemandW,
+            label: `${(unmetDemandW / 1000).toFixed(1)} kW import`,
+          });
+        }
       }
     } else {
       grid.currentPowerW = 0;
-      meter.currentPowerW = 0;
+      if (meters.length > 0) meters[0].currentPowerW = 0;
     }
   }
   
