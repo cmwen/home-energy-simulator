@@ -10,11 +10,27 @@ import LearnSection from './components/education/LearnSection';
 import ProtocolsSection from './components/education/ProtocolsSection';
 import StrategiesSection from './components/education/StrategiesSection';
 import ScenariosSection from './components/scenarios/ScenariosSection';
+import SetupToolbar from './components/toolbar/SetupToolbar';
+import { decodeSetupFromUrl, loadFromLocalStorage, clearUrlParam } from './utils/persistence';
 
 function App() {
-  const { activeTab, setActiveTab, userLevel, setUserLevel, selectedComponentId, recalculate } = useEnergyStore();
+  const { activeTab, setActiveTab, userLevel, setUserLevel, selectedComponentId, recalculate, importSetup } = useEnergyStore();
 
   useEffect(() => {
+    // Priority 1: URL share param — load and clean the URL
+    const urlSnapshot = decodeSetupFromUrl();
+    if (urlSnapshot) {
+      importSetup(urlSnapshot);
+      clearUrlParam();
+      return;
+    }
+    // Priority 2: Auto-saved localStorage
+    const lsSnapshot = loadFromLocalStorage();
+    if (lsSnapshot) {
+      importSetup(lsSnapshot);
+      return;
+    }
+    // Priority 3: Default system
     recalculate();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -93,6 +109,7 @@ function App() {
             <SessionStatsPanel />
             <div style={{ display: 'flex', gap: '16px', marginTop: '16px' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
+                <SetupToolbar />
                 <SystemDiagram />
                 <SimulationControls />
                 <AddComponentPanel />

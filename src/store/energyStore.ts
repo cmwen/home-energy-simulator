@@ -9,6 +9,8 @@ import type {
   ScenarioPreset,
 } from '../types/energy';
 import { calculatePowerFlows, calculateSummary } from '../utils/simulation';
+import { buildSnapshot, saveToLocalStorage } from '../utils/persistence';
+import type { SetupSnapshot } from '../utils/persistence';
 
 // ─── Default component factory ────────────────────────────────────────────────
 
@@ -327,6 +329,7 @@ interface EnergyStore {
   recalculate: () => void;
   resetToDefault: () => void;
   resetSessionStats: () => void;
+  importSetup: (snapshot: SetupSnapshot) => void;
 }
 
 // ─── Store ────────────────────────────────────────────────────────────────────
@@ -455,4 +458,39 @@ export const useEnergyStore = create<EnergyStore>((set, get) => ({
     });
     get().recalculate();
   },
+
+  importSetup: (snapshot: SetupSnapshot) => {
+    set({
+      components: snapshot.components,
+      simulation: { ...defaultSimulation, ...snapshot.simulation, isRunning: false },
+      powerFlows: [],
+      selectedComponentId: null,
+      activeScenarioId: null,
+      sessionStats: { solarKwh: 0, importKwh: 0, exportKwh: 0, homeKwh: 0, evKwh: 0 },
+    });
+    get().recalculate();
+  },
 }));
+
+// ─── Auto-save to localStorage on meaningful changes ──────────────────────────
+// Subscribe after create so we can reference useEnergyStore.
+// We skip saving on every recalculate() tick to avoid thrashing storage;
+// the subscription fires only when components or simulation actually differ.
+
+let _lastSavedComponents: string | null = null;
+let _lastSavedSimulation: string | null = null;
+
+useEnergyStore.subscribe((state) => {
+  // Skip saving while the simulation is running (too frequent)
+  if (state.simulation.isRunning) return;
+
+  const compKey = JSON.stringify(state.components);
+  const simKey = JSON.stringify(state.simulation);
+
+  if (compKey === _lastSavedComponents && simKey === _lastSavedSimulation) return;
+
+  _lastSavedComponents = compKey;
+  _lastSavedSimulation = simKey;
+
+  saveToLocalStorage(buildSnapshot(state.components, state.simulation));
+});
